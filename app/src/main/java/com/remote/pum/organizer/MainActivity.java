@@ -2,15 +2,25 @@ package com.remote.pum.organizer;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView notesRecyclerView;
     private NotesRecyclerViewAdapter notesRecyclerViewAdapter;
     private File data;
+    private List<Note> notes;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -33,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 created = data.createNewFile();
                 //throw new IOException();
             } catch (IOException e) {
-                closeAppWithFileError().show();
+                closeAppWithFileError("Nie udało sie utworzyć pliku.").show();
             }
 
             if (created) {
@@ -46,32 +58,33 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 builder.create().show();
+
+                notes = new ArrayList<>();
             }
             else {
-                closeAppWithFileError().show();
+                closeAppWithFileError("Nie udało się utworzyć pliku.").show();
             }
         }
         else {
-            Toast.makeText(this, "Załadowano notatki", Toast.LENGTH_LONG).show();
+            try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(data))) {
+                notes = (List<Note>) objectInputStream.readObject();
+                Toast.makeText(this, "Załadowano notatki", Toast.LENGTH_LONG).show();
+            }
+            catch (IOException | ClassNotFoundException e) {
+                closeAppWithFileError("Błąd odczytu danych.").show();
+            }
         }
 
-        List<Note> notes = new ArrayList<>();
-        notes.add(new Note("Do zrobienia"));
-        notes.add(new Note("Zakupy").setContent("Aparat\nTelefon\nLaptop"));
-        notes.add(new Note("Przykład dłuższego tekstu").setContent("Prezentowanie danych w postaci listy elementów to bardzo popularny wzorzec aplikacji mobilnych. Wystarczy otworzyć kilka aplikacji od Google, aby się o tym przekonać. Google Play wyświetla aplikacje w postaci listy. Gmail wyświetla e-maile w postaci listy. Google+ również wyświetla zawartość w postaci listy elementów."));
-        notes.add(new Note("Mercedes-Benz").setContent("Mercedes-Benz – marka samochodów produkowanych przez koncern Daimler AG, zaś wcześniej przez koncern Daimler-Benz, popularnie nazywana Mercedes. Pod marką tą produkowane są samochody osobowe, dostawcze, ciężarowe i autobusy. W kategorii samochodów osobowych, Mercedes-Benz uważany jest za jedną z najstarszych."));
-        notes.add(new Note("Fendt").setContent("Fendt – niemiecki producent ciągników, kombajnów i maszyn rolniczych. Jest częścią AGCO Corporation. Został założony w 1937 roku przez Xaver Fendta i zakupiony przez AGCO w 1997 roku."));
-
-        notesRecyclerView = findViewById(R.id.listOfNotesRecyclerView);
+        notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
         notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(notes);
 
         notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         notesRecyclerView.setAdapter(notesRecyclerViewAdapter);
     }
 
-    private AlertDialog closeAppWithFileError() {
+    private AlertDialog closeAppWithFileError(String additionalInfo) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Nie udało się utworzyć pliku z danymi, należy uruchomić aplikację ponownie.");
+        builder.setMessage("Błąd dostępu do danych, uruchom aplikację ponownie, a w przypadku niepowodzenia wyczyść dane aplikacji.\n" + additionalInfo);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -79,5 +92,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         return builder.create();
+    }
+
+    private void saveData() {
+        try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(data))) {
+            objectOutputStream.writeObject(notes);
+            Toast.makeText(this, "Zapisano", Toast.LENGTH_LONG).show();
+        }
+        catch (IOException e) {
+            closeAppWithFileError("Błąd zapisu danych.").show();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.new_note) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Tytuł notatki");
+
+            final View view = getLayoutInflater().inflate(R.layout.add_note_layout, null);
+            builder.setView(view);
+
+            builder.setPositiveButton("Zapisz", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    EditText titleEditText = view.findViewById(R.id.title_edit_text);
+                    String title = titleEditText.getText().toString();
+                    notes.add(new Note(title));
+                    saveData();
+                }
+            });
+
+            builder.setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {}
+            });
+
+            builder.create().show();
+        }
+        return true;
     }
 }
