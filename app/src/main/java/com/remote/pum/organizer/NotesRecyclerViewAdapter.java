@@ -1,6 +1,9 @@
 package com.remote.pum.organizer;
 
+import android.content.Context;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -12,10 +15,12 @@ import java.util.List;
 
 public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecyclerViewAdapter.ViewHolder> {
     List<Note> notes;
-    RecyclerViewClickListener recyclerViewClickListener;
+    RecyclerViewListener recyclerViewListener;
+    GestureDetector gestureDetector;
 
-    public NotesRecyclerViewAdapter(List<Note> notes) {
+    public NotesRecyclerViewAdapter(Context context, List<Note> notes) {
         this.notes = notes;
+        gestureDetector = new GestureDetector(context, new RecyclerViewGestureDetector());
     }
 
     @NonNull
@@ -37,7 +42,22 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recyclerViewClickListener.onModifyClick(v, position);
+                recyclerViewListener.onModifyClick(v, position);
+            }
+        });
+
+        holder.itemView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                RecyclerViewGestureDetector.setToDelete(false);
+                gestureDetector.onTouchEvent(event);
+
+                if (RecyclerViewGestureDetector.isToDelete()) {
+                    recyclerViewListener.onDeleteMotion(v, position);
+                    return true;
+                }
+
+                return false;
             }
         });
     }
@@ -58,7 +78,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
         }
     }
 
-    public void setRecyclerViewClickListener(RecyclerViewClickListener recyclerViewClickListener) {
-        this.recyclerViewClickListener = recyclerViewClickListener;
+    public void setRecyclerViewListener(RecyclerViewListener recyclerViewListener) {
+        this.recyclerViewListener = recyclerViewListener;
     }
 }

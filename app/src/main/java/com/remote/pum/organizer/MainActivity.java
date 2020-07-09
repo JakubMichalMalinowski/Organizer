@@ -27,7 +27,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewClickListener {
+public class MainActivity extends AppCompatActivity implements RecyclerViewListener {
     private RecyclerView notesRecyclerView;
     private NotesRecyclerViewAdapter notesRecyclerViewAdapter;
     private File data;
@@ -80,8 +80,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
 
         if (notes != null) {
             notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
-            notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(notes);
-            notesRecyclerViewAdapter.setRecyclerViewClickListener(this);
+            notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(this, notes);
+            notesRecyclerViewAdapter.setRecyclerViewListener(this);
 
             notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             notesRecyclerView.setAdapter(notesRecyclerViewAdapter);
@@ -174,5 +174,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         Intent intent = new Intent(this, NoteActivity.class);
         intent.putExtra("current_note", notes.get(position));
         startActivityForResult(intent, position);
+    }
+
+    @Override
+    public void onDeleteMotion(View view, final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Usuwanie notatki")
+                .setMessage("Czy na pewno chcesz usunąć tą notatkę?")
+                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        notes.remove(position);
+                        notesRecyclerViewAdapter.notifyItemRemoved(position);
+                        notesRecyclerViewAdapter.notifyItemRangeChanged(0, notes.size());
+                        saveData();
+                    }
+                })
+                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {}
+                }).create().show();
     }
 }
