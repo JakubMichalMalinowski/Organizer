@@ -8,6 +8,7 @@ public class Note implements Serializable {
 
     public Note(String title) {
         this.title = title;
+        this.content = null;
     }
 
     public String getTitle() {
@@ -18,13 +19,11 @@ public class Note implements Serializable {
         return content;
     }
 
-    public Note setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
-        return this;
     }
 
-    public Note setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
-        return this;
     }
 }

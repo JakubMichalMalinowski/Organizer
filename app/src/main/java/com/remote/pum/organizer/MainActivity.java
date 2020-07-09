@@ -1,6 +1,7 @@
 package com.remote.pum.organizer;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,8 +11,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,7 +27,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewClickListener {
     private RecyclerView notesRecyclerView;
     private NotesRecyclerViewAdapter notesRecyclerViewAdapter;
     private File data;
@@ -75,11 +78,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
-        notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(notes);
+        if (notes != null) {
+            notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
+            notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(notes);
+            notesRecyclerViewAdapter.setRecyclerViewClickListener(this);
 
-        notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        notesRecyclerView.setAdapter(notesRecyclerViewAdapter);
+            notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            notesRecyclerView.setAdapter(notesRecyclerViewAdapter);
+            notesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        }
     }
 
     private AlertDialog closeAppWithFileError(String additionalInfo) {
@@ -138,5 +145,29 @@ public class MainActivity extends AppCompatActivity {
             builder.create().show();
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (data != null) {
+            Note note = (Note) data.getSerializableExtra("return_note");
+
+            if (note != null) {
+                notes.get(requestCode).setTitle(note.getTitle());
+                notes.get(requestCode).setContent(note.getContent());
+            }
+        }
+
+        notesRecyclerViewAdapter.notifyItemChanged(requestCode);
+        saveData();
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onModifyClick(View view, int position) {
+        Intent intent = new Intent(this, NoteActivity.class);
+        intent.putExtra("current_note", notes.get(position));
+        startActivityForResult(intent, position);
     }
 }
