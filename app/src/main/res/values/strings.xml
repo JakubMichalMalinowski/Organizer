@@ -2,4 +2,7 @@
     <string name="app_name">Organizer</string>
     <string name="no_data">Brak danych</string>
     <string name="new_note">Nowa notatka</string>
+    <string name="note">Notatka</string>
+    <string name="note_content_hint">Treść notatki</string>
+    <string name="note_title_hint">Tytuł notatki</string>
 </resources>

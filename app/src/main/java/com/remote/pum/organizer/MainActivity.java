@@ -132,8 +132,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                 public void onClick(DialogInterface dialog, int which) {
                     EditText titleEditText = view.findViewById(R.id.title_edit_text);
                     String title = titleEditText.getText().toString();
-                    notes.add(new Note(title));
-                    saveData();
+                    if (!title.equals("")) {
+                        notes.add(new Note(title));
+                        saveData();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Anulowano. Wprowadzono pusty tytuł", Toast.LENGTH_LONG).show();
+                    }
                 }
             });
 
