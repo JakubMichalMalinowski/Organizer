@@ -160,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             if (note != null) {
                 notes.get(requestCode).setTitle(note.getTitle());
                 notes.get(requestCode).setContent(note.getContent());
+                notes.get(requestCode).setPicture(note.getPicture());
             }
         }
 

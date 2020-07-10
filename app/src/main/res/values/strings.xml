@@ -5,4 +5,6 @@
     <string name="note">Notatka</string>
     <string name="note_content_hint">Treść notatki</string>
     <string name="note_title_hint">Tytuł notatki</string>
+    <string name="photo">Photo</string>
+    <string name="add_picture">Dodaj obraz</string>
 </resources>
