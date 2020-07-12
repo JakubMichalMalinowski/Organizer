@@ -8,4 +8,16 @@
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_add_note" />
 
+    <item
+        android:id="@+id/choose_color"
+        android:title="@string/choose_color"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_choose_color"/>
+
+    <item
+        android:id="@+id/help"
+        android:title="@string/info_and_help"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_help"/>
+
 </menu>

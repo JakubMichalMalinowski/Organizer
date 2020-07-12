@@ -1,6 +1,10 @@
 package com.remote.pum.organizer;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -11,18 +15,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
 import java.util.List;
 
 public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecyclerViewAdapter.ViewHolder> {
-    List<Note> notes;
-    RecyclerViewListener recyclerViewListener;
-    GestureDetector gestureDetector;
+    private List<Note> notes;
+    private RecyclerViewListener recyclerViewListener;
+    private GestureDetector gestureDetector;
+    private AlertDialog pictureNotExistAlertDialog;
+    private SharedPreferences preferences;
 
-    public NotesRecyclerViewAdapter(Context context, List<Note> notes) {
+    public NotesRecyclerViewAdapter(Context context, SharedPreferences preferences, List<Note> notes) {
         this.notes = notes;
+        this.preferences = preferences;
         gestureDetector = new GestureDetector(context, new RecyclerViewGestureDetector());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        pictureNotExistAlertDialog = builder.setMessage("Niektóre obrazy nie istnieją/zosatały usunięte z oryginalnej lokalizacji. Aby zapobiec zbędnemu pokazywaniu komunikatu należy usunąć obraz z poziomu notatki.").setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {}
+        }).create();
     }
 
     @NonNull
@@ -33,24 +48,32 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
         switch (viewType) {
             case 2:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_layout_with_picture, parent, false);
+                setColor(view);
                 return new ViewHolderWithPicture(view);
 
             case 1:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_layout_with_content, parent, false);
+                setColor(view);
                 return new ViewHolderWithContent(view);
         }
 
+        setColor(view);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case 2:
-                ((ViewHolderWithPicture)holder).imageView.setImageURI(Uri.parse(notes.get(position).getPicture()));
+                File photo = new File(notes.get(position).getPicture());
+                if (photo.exists()) {
+                    ((ViewHolderWithPicture) holder).imageView.setImageURI(Uri.parse(photo.toString()));
+                } else {
+                    pictureNotExistAlertDialog.show();
+                }
 
             case 1:
-                ((ViewHolderWithContent)holder).contentTextView.setText(notes.get(position).getContent());
+                ((ViewHolderWithContent) holder).contentTextView.setText(notes.get(position).getContent());
 
             case 0:
                 holder.titleTextView.setText(notes.get(position).getTitle());
@@ -117,14 +140,19 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
 
     @Override
     public int getItemViewType(int position) {
-       if (notes.get(position).getPicture() != null) {
-           return 2;
-       }
+        if (notes.get(position).getPicture() != null) {
+            return 2;
+        }
 
-       if (!notes.get(position).getContent().equals("")) {
-           return 1;
-       }
+        if (!notes.get(position).getContent().equals("")) {
+            return 1;
+        }
 
-       return 0;
+        return 0;
+    }
+
+    private void setColor(View view) {
+        CardView cardView = view.findViewById(R.id.card_view);
+        cardView.setCardBackgroundColor(preferences.getInt("note_color", Color.WHITE));
     }
 }

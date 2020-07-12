@@ -6,5 +6,8 @@
     <string name="note_content_hint">Treść notatki</string>
     <string name="note_title_hint">Tytuł notatki</string>
     <string name="photo">Photo</string>
-    <string name="add_picture">Dodaj obraz</string>
+    <string name="add_picture">Dodaj/zmień obraz</string>
+    <string name="del_photo">Usuń obraz</string>
+    <string name="choose_color">Wybierz kolor tła notatek</string>
+    <string name="info_and_help">Informacje i pomoc</string>
 </resources>

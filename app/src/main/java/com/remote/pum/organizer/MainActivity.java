@@ -2,6 +2,8 @@ package com.remote.pum.organizer;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,29 +69,46 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 builder.create().show();
 
                 notes = new ArrayList<>();
-            }
-            else {
+                saveData();
+            } else {
                 closeAppWithFileError("Nie udało się utworzyć pliku.").show();
             }
-        }
-        else {
-            try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(data))) {
+        } else {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(data))) {
                 notes = (List<Note>) objectInputStream.readObject();
-                Toast.makeText(this, "Załadowano notatki", Toast.LENGTH_LONG).show();
-            }
-            catch (IOException | ClassNotFoundException e) {
+                if (!notes.isEmpty()) {
+                    Toast.makeText(this, "Załadowano notatki", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Brak notatek", Toast.LENGTH_LONG).show();
+                }
+            } catch (IOException | ClassNotFoundException e) {
                 closeAppWithFileError("Błąd odczytu danych.").show();
             }
         }
 
         if (notes != null) {
+            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+
             notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
-            notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(this, notes);
+
+            notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(this, preferences, notes);
             notesRecyclerViewAdapter.setRecyclerViewListener(this);
 
             notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             notesRecyclerView.setAdapter(notesRecyclerViewAdapter);
             notesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+            if (preferences.getBoolean("show_help", true)) {
+                buildHelpBaseAlertDialogBuilder().setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {}
+                }).setNegativeButton("Nie pokazuj ponownie", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        preferences.edit().putBoolean("show_help", false).apply();
+                    }
+                }).create().show();
+            }
         }
     }
 
@@ -102,11 +125,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     }
 
     private void saveData() {
-        try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(data))) {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(data))) {
             objectOutputStream.writeObject(notes);
             Toast.makeText(this, "Zapisano", Toast.LENGTH_LONG).show();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             closeAppWithFileError("Błąd zapisu danych.").show();
         }
     }
@@ -135,8 +157,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                     if (!title.equals("")) {
                         notes.add(new Note(title));
                         saveData();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(getApplicationContext(), "Anulowano. Wprowadzono pusty tytuł", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -144,11 +165,45 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
 
             builder.setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {}
+                public void onClick(DialogInterface dialog, int which) {
+                }
             });
 
             builder.create().show();
         }
+
+        if (item.getItemId() == R.id.choose_color) {
+            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+
+            ColorPickerDialogBuilder
+                    .with(this)
+                    .setTitle("Kolor notatek zmieni sie po restarcie aplikacji")
+                    .initialColor(preferences.getInt("note_color", Color.WHITE))
+                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                    .density(12)
+                    .setPositiveButton("ok", new ColorPickerClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                            preferences.edit().putInt("note_color", selectedColor).apply();
+                            Toast.makeText(getApplicationContext(), "Kolor notatek zmieni się po ponownym uruchomieniu aplikacji", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .setNegativeButton("anuluj", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .build()
+                    .show();
+        }
+
+        if (item.getItemId() == R.id.help) {
+            buildHelpBaseAlertDialogBuilder().setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {}
+            }).create().show();
+        }
+
         return true;
     }
 
@@ -193,7 +248,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 })
                 .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {}
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
                 }).create().show();
+    }
+
+    private AlertDialog.Builder buildHelpBaseAlertDialogBuilder() {
+        return new AlertDialog.Builder(this).setTitle("Informacje i pomoc")
+                .setMessage("Aplikacja umożliwiwa dodawanie SZYBKICH NOTATEK, które są reprezentowane tylko tytułem. " +
+                        "Po dotknięciu takiej notatki możliwa jest jej edycja i rozbudowanie jej o opis oraz dodanie obrazka. " +
+                        "Zapis danej notatki po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
+                        "Usunięcie następuje poprzez przesuniecie danej notatki w prawo bądź lewo. " +
+                        "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +
+                        "W razie wątpliwości można wrócić do tej informacji poprzez dotknięcie znaku zapytania w górnej belce aplikacji. ");
     }
 }

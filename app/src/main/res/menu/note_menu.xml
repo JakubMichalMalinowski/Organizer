@@ -4,7 +4,13 @@
 
     <item
         android:id="@+id/add_picture_menu_item"
+        android:icon="@drawable/ic_add_photo"
         android:title="@string/add_picture"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_add_photo"/>
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remove_picture_menu_item"
+        android:title="@string/del_photo"
+        app:showAsAction="never"/>
+
 </menu>
