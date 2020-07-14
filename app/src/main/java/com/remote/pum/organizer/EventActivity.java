@@ -1,14 +1,181 @@
 package com.remote.pum.organizer;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 public class EventActivity extends AppCompatActivity {
+    private static final Integer[] YEARS = new Integer[100];
+    private static final Integer[] MONTHS = new Integer[12];
+    private static final List<Integer> DAYS = new ArrayList<>();
+    private static final Integer[] HOURS = new Integer[24];
+    private static final Integer[] MINS = new Integer[60];
+
+    private Note note;
+    private TextView dateTextView;
+    private TextView locationTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
+
+        dateTextView = findViewById(R.id.date_text_view);
+        locationTextView = findViewById(R.id.location_text_view);
+
+        note = (Note) getIntent().getSerializableExtra("current_note_for_event");
+
+        if (note != null) {
+            if (note.getDate() != null) {
+                dateTextView.setText(note.getDate());
+            } else {
+                dateTextView.setText(R.string.no_data);
+            }
+
+            if (note.getLocation() != null && !note.getLocation().equals("")) {
+                locationTextView.setText(note.getLocation());
+            } else {
+                locationTextView.setText(R.string.no_data);
+            }
+
+            for (int i = 0; i < YEARS.length; ++i) {
+                YEARS[i] = i + 2000;
+            }
+
+            for (int i = 0; i < MONTHS.length; ++i) {
+                MONTHS[i] = i + 1;
+            }
+
+            for (int i = 0; i < 31; ++i) {
+                DAYS.add(i + 1);
+            }
+
+            for (int i = 0; i < HOURS.length; ++i) {
+                HOURS[i] = i;
+            }
+
+            for (int i = 0; i < MINS.length; ++i) {
+                MINS[i] = i;
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.event_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.edit_date_menu_item) {
+            View view = LayoutInflater.from(this).inflate(R.layout.edit_date_layout, null, false);
+
+            final Spinner yearSpinner = view.findViewById(R.id.year_spinner);
+            yearSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, YEARS));
+
+            final Spinner monthSpinner = view.findViewById(R.id.month_spinner);
+            monthSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, MONTHS));
+
+            final Spinner daySpinner = view.findViewById(R.id.day_spinner);
+            setDaysNumber(yearSpinner, monthSpinner, daySpinner);
+
+            yearSpinner.setSelection(Calendar.getInstance().get(Calendar.YEAR) - 2000);
+            monthSpinner.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+
+            yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    setDaysNumber(yearSpinner, monthSpinner, daySpinner);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    setDaysNumber(yearSpinner, monthSpinner, daySpinner);
+                }
+            });
+
+            monthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    setDaysNumber(yearSpinner, monthSpinner, daySpinner);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    setDaysNumber(yearSpinner, monthSpinner, daySpinner);
+                }
+            });
+
+            final Spinner hourSpinner = (Spinner)view.findViewById(R.id.hour_spinner);
+            hourSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, HOURS));
+            hourSpinner.setSelection(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+
+            final Spinner minSpinner = (Spinner)view.findViewById(R.id.min_spinner);
+            minSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, MINS));
+            minSpinner.setSelection(Calendar.getInstance().get(Calendar.MINUTE));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Edycja daty")
+                    .setView(view)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            note.setDate((int) yearSpinner.getSelectedItem(), (int) monthSpinner.getSelectedItem(), (int) daySpinner.getSelectedItem(), (int) hourSpinner.getSelectedItem(), (int) minSpinner.getSelectedItem());
+                            dateTextView.setText(note.getDate());
+                        }
+                    })
+                    .setNegativeButton("Usuń datę", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            note.setDate(null);
+                            dateTextView.setText(R.string.no_data);
+                        }
+                    }).create().show();
+        }
+
+        if (item.getItemId() == R.id.edit_location_menu_item) {
+
+        }
+
+        return true;
+    }
+
+    private void setDaysNumber(Spinner yearSpinner, Spinner monthSpinner, Spinner daySpinner) {
+        int month = ((int) monthSpinner.getSelectedItem());
+        int year = ((int) yearSpinner.getSelectedItem());
+
+        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+            daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS));
+        } else {
+            if (month == 2) {
+                if ((year % 4) == 0) {
+                    daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 29)));
+                } else {
+                    daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 28)));
+                }
+            } else {
+                daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 30)));
+            }
+        }
+
+        daySpinner.setSelection(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
     }
 }

@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/add_event_menu_item"
+        android:icon="@drawable/ic_add_event"
+        android:title="@string/add_event"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/remove_picture_menu_item"
         android:title="@string/del_photo"
         app:showAsAction="never"/>

@@ -22,6 +22,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class NoteActivity extends AppCompatActivity {
+    private static final int PICTURE_REQUEST = 1;
+    private static final int EVENT_REQUEST = 2;
+    private static final int PERMISSION_REQUEST = 3;
+
     private Note note;
 
     private EditText titleEditText;
@@ -77,7 +81,7 @@ public class NoteActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_picture_menu_item) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 9);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
             } else {
                 choosePicture();
             }
@@ -99,13 +103,19 @@ public class NoteActivity extends AppCompatActivity {
                     }).create().show();
         }
 
+        if (item.getItemId() == R.id.add_event_menu_item) {
+            Intent intent = new Intent(this, EventActivity.class);
+            intent.putExtra("current_note_for_event", note);
+            startActivityForResult(intent, EVENT_REQUEST);
+        }
+
         return true;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICTURE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             String result;
             Cursor cursor = getContentResolver().query(data.getData(), null, null, null, null);
             if (cursor == null) {
@@ -119,6 +129,10 @@ public class NoteActivity extends AppCompatActivity {
 
             note.setPicture(result);
         }
+
+        if (requestCode == EVENT_REQUEST && resultCode == RESULT_OK) {
+
+        }
     }
 
     private void choosePicture() {
@@ -126,13 +140,13 @@ public class NoteActivity extends AppCompatActivity {
         intent.setType("image/*");
         String[] mimeTypes = {"image/jpeg", "image/png", "image/bmp"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, PICTURE_REQUEST);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 9) {
+        if (requestCode == PERMISSION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 choosePicture();
             } else {

@@ -10,4 +10,15 @@
     <string name="del_photo">Usuń obraz</string>
     <string name="choose_color">Wybierz kolor tła notatek</string>
     <string name="info_and_help">Informacje i pomoc</string>
+    <string name="event">Wydarzenie</string>
+    <string name="add_event">Dodaj wydarzenie</string>
+    <string name="date">Data:</string>
+    <string name="location">Miejscowość:</string>
+    <string name="edit_date">Edytuj datę</string>
+    <string name="edit_location">Edytuj miejscowość</string>
+    <string name="day">Dzień</string>
+    <string name="month">Miesiąc</string>
+    <string name="year">Rok</string>
+    <string name="hour">Godzina</string>
+    <string name="min">Minuty</string>
 </resources>
