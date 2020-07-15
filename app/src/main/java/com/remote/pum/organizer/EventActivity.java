@@ -63,8 +63,10 @@ public class EventActivity extends AppCompatActivity {
                 MONTHS[i] = i + 1;
             }
 
-            for (int i = 0; i < 31; ++i) {
-                DAYS.add(i + 1);
+            if (DAYS.isEmpty()) {
+                for (int i = 0; i < 31; ++i) {
+                    DAYS.add(i + 1);
+                }
             }
 
             for (int i = 0; i < HOURS.length; ++i) {
