@@ -216,6 +216,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 notes.get(requestCode).setTitle(note.getTitle());
                 notes.get(requestCode).setContent(note.getContent());
                 notes.get(requestCode).setPicture(note.getPicture());
+                notes.get(requestCode).setDate(note.getDateDate());
+                notes.get(requestCode).setLocation(note.getLocation());
             }
         }
 

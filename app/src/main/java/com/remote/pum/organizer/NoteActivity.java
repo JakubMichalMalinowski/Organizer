@@ -130,8 +130,12 @@ public class NoteActivity extends AppCompatActivity {
             note.setPicture(result);
         }
 
-        if (requestCode == EVENT_REQUEST && resultCode == RESULT_OK) {
-
+        if (requestCode == EVENT_REQUEST && resultCode == RESULT_OK && data != null) {
+            Note returnNote = (Note) data.getSerializableExtra("note_return_from_event");
+            if (returnNote != null) {
+                this.note.setDate(returnNote.getDateDate());
+                this.note.setLocation(returnNote.getLocation());
+            }
         }
     }
 

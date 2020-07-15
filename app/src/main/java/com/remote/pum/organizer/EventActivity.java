@@ -1,6 +1,7 @@
 package com.remote.pum.organizer;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -97,8 +98,13 @@ public class EventActivity extends AppCompatActivity {
             final Spinner daySpinner = view.findViewById(R.id.day_spinner);
             setDaysNumber(yearSpinner, monthSpinner, daySpinner);
 
-            yearSpinner.setSelection(Calendar.getInstance().get(Calendar.YEAR) - 2000);
-            monthSpinner.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+            if (note.getDate() == null) {
+                yearSpinner.setSelection(Calendar.getInstance().get(Calendar.YEAR) - 2000);
+                monthSpinner.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+            } else {
+                yearSpinner.setSelection(note.getDateYear() - 2000);
+                monthSpinner.setSelection(note.getDateMonth());
+            }
 
             yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -126,11 +132,17 @@ public class EventActivity extends AppCompatActivity {
 
             final Spinner hourSpinner = (Spinner)view.findViewById(R.id.hour_spinner);
             hourSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, HOURS));
-            hourSpinner.setSelection(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
 
             final Spinner minSpinner = (Spinner)view.findViewById(R.id.min_spinner);
             minSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, MINS));
-            minSpinner.setSelection(Calendar.getInstance().get(Calendar.MINUTE));
+
+            if (note.getDate() == null) {
+                hourSpinner.setSelection(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+                minSpinner.setSelection(Calendar.getInstance().get(Calendar.MINUTE));
+            } else {
+                hourSpinner.setSelection(note.getDateHour());
+                minSpinner.setSelection(note.getDateMin());
+            }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Edycja daty")
@@ -176,6 +188,19 @@ public class EventActivity extends AppCompatActivity {
             }
         }
 
-        daySpinner.setSelection(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
+        if (note.getDate() == null) {
+            daySpinner.setSelection(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
+        } else {
+            daySpinner.setSelection(note.getDateDay() - 1);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("note_return_from_event", note);
+        setResult(RESULT_OK, intent);
+
+        super.onBackPressed();
     }
 }
