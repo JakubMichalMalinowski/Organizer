@@ -257,8 +257,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
 
     private AlertDialog.Builder buildHelpBaseAlertDialogBuilder() {
         return new AlertDialog.Builder(this).setTitle("Informacje i pomoc")
-                .setMessage("Aplikacja umożliwiwa dodawanie SZYBKICH NOTATEK, które są reprezentowane tylko tytułem. " +
+                .setMessage("Aplikacja umożliwiwa dodawanie różnego typu notatek, np. \"szybkich\" które są reprezentowane tylko tytułem. " +
                         "Po dotknięciu takiej notatki możliwa jest jej edycja i rozbudowanie jej o opis oraz dodanie obrazka. " +
+                        "Do danej notatki możliwe jest także dodawanie wydarzenia poprzez dotknięcie odpowiedniego przycisku. " +
+                        "W wydarzeniu możemy modyfikować datę wraz z godziną i lokalizację. " +
                         "Zapis danej notatki po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
                         "Usunięcie następuje poprzez przesuniecie danej notatki w prawo bądź lewo. " +
                         "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +

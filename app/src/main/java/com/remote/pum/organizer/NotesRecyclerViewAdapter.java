@@ -23,15 +23,16 @@ import java.util.List;
 
 public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecyclerViewAdapter.ViewHolder> {
     private List<Note> notes;
-    private RecyclerViewListener recyclerViewListener;
     private GestureDetector gestureDetector;
     private AlertDialog pictureNotExistAlertDialog;
     private SharedPreferences preferences;
+    private RecyclerViewGestureDetector recyclerViewGestureDetector;
 
     public NotesRecyclerViewAdapter(Context context, SharedPreferences preferences, List<Note> notes) {
         this.notes = notes;
         this.preferences = preferences;
-        gestureDetector = new GestureDetector(context, new RecyclerViewGestureDetector());
+        recyclerViewGestureDetector = new RecyclerViewGestureDetector();
+        gestureDetector = new GestureDetector(context, recyclerViewGestureDetector);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         pictureNotExistAlertDialog = builder.setMessage("Niektóre obrazy nie istnieją/zosatały usunięte z oryginalnej lokalizacji. Aby zapobiec zbędnemu pokazywaniu komunikatu należy usunąć obraz z poziomu notatki.").setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -79,25 +80,14 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
                 holder.titleTextView.setText(notes.get(position).getTitle());
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recyclerViewListener.onModifyClick(v, position);
-            }
-        });
-
         holder.itemView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                RecyclerViewGestureDetector.setToDelete(false);
+                v.performClick();
+                recyclerViewGestureDetector.setView(v);
+                recyclerViewGestureDetector.setPosition(position);
                 gestureDetector.onTouchEvent(event);
-
-                if (RecyclerViewGestureDetector.isToDelete()) {
-                    recyclerViewListener.onDeleteMotion(v, position);
-                    return true;
-                }
-
-                return false;
+                return true;
             }
         });
     }
@@ -135,7 +125,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
     }
 
     public void setRecyclerViewListener(RecyclerViewListener recyclerViewListener) {
-        this.recyclerViewListener = recyclerViewListener;
+        this.recyclerViewGestureDetector.setRecyclerViewListener(recyclerViewListener);
     }
 
     @Override

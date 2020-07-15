@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -166,7 +167,34 @@ public class EventActivity extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.edit_location_menu_item) {
+            final View view = getLayoutInflater().inflate(R.layout.edit_location_layout, null, false);
+            final EditText locationEditText = view.findViewById(R.id.location_edit_text);
 
+            if (note.getLocation() != null && !note.getLocation().equals("")) {
+                locationEditText.setText(note.getLocation());
+            }
+
+            new AlertDialog.Builder(this).setTitle("Lokalizacja")
+                    .setView(view)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            note.setLocation(locationEditText.getText().toString());
+
+                            if (note.getLocation().equals("")) {
+                                locationTextView.setText(R.string.no_data);
+                            } else {
+                                locationTextView.setText(note.getLocation());
+                            }
+                        }
+                    })
+                    .setNegativeButton("Usuń lokalizację", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            note.setLocation("");
+                            locationTextView.setText(R.string.no_data);
+                        }
+                    }).create().show();
         }
 
         return true;
