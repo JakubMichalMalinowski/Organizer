@@ -1,5 +1,6 @@
 package com.remote.pum.organizer;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,13 +24,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -172,13 +177,37 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             builder.create().show();
         }
 
+        if (item.getItemId() == R.id.last_weather) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View view = getLayoutInflater().inflate(R.layout.weather_location_layout, null, false);
+            final EditText editText = view.findViewById(R.id.weather_location_edit_text);
+            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+
+            editText.setText(preferences.getString("weather_location", ""));
+
+            builder.setTitle("Wpisz miejscowość (bez polskich znakow)")
+                    .setView(view)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            preferences.edit().putString("weather_location", editText.getText().toString()).apply();
+                            downloadWeather(editText.getText().toString());
+                        }
+                    })
+                    .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {}
+                    }).create().show();
+
+        }
+
         if (item.getItemId() == R.id.choose_color) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
 
             ColorPickerDialogBuilder
                     .with(this)
                     .setTitle("Kolor notatek zmieni sie po restarcie aplikacji")
-                    .initialColor(preferences.getInt("note_color", Color.WHITE))
+                    .initialColor(preferences.getInt("note_color", Color.parseColor("#FFFACD")))
                     .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                     .density(12)
                     .setPositiveButton("ok", new ColorPickerClickListener() {
@@ -262,8 +291,63 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                         "Do danej notatki możliwe jest także dodawanie wydarzenia poprzez dotknięcie odpowiedniego przycisku. " +
                         "W wydarzeniu możemy modyfikować datę wraz z godziną i lokalizację. " +
                         "Zapis danej notatki po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
-                        "Usunięcie następuje poprzez przesuniecie danej notatki w prawo bądź lewo. " +
+                        "Usunięcie następuje poprzez przesuniecie danej notatki poziomo w linii prostej w prawo bądż lewo. " +
                         "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +
                         "W razie wątpliwości można wrócić do tej informacji poprzez dotknięcie znaku zapytania w górnej belce aplikacji. ");
+    }
+
+    private void downloadWeather(String location) {
+        final String loc = location.toLowerCase();
+        final Context context = this;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                URL imgw;
+                HttpURLConnection imgwConnection = null;
+
+                try {
+                    imgw = new URL("https://danepubliczne.imgw.pl/api/data/synop/station/" + loc + "/format/json");
+                    imgwConnection = (HttpURLConnection) imgw.openConnection();
+                    Gson gson = new Gson();
+                    if (imgwConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        InputStreamReader reader = new InputStreamReader(imgwConnection.getInputStream());
+                        final Weather weather = gson.fromJson(reader, Weather.class);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new AlertDialog.Builder(context).setTitle("Pogoda dla: " + weather.getStacja())
+                                        .setMessage("Temperatura: " + weather.getTemperatura() +
+                                                "\n Opady: " + weather.getSuma_opadu())
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {}
+                                        }).create().show();
+                            }
+                        });
+
+                    } else {
+                        throw new IOException();
+                    }
+                } catch (IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new AlertDialog.Builder(context).setTitle("Błąd")
+                                    .setMessage("Bład przy połączeniu z serwerem dostarczającym informacje pogodowe. Pobranie danych jest niemożliwe.")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {}
+                                    }).create().show();
+                        }
+                    });
+                } finally {
+                    if (imgwConnection != null) {
+                        imgwConnection.disconnect();
+                    }
+                }
+            }
+        }).start();
     }
 }

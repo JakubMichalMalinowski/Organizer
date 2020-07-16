@@ -143,6 +143,6 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
 
     private void setColor(View view) {
         CardView cardView = view.findViewById(R.id.card_view);
-        cardView.setCardBackgroundColor(preferences.getInt("note_color", Color.WHITE));
+        cardView.setCardBackgroundColor(preferences.getInt("note_color", Color.parseColor("#FFFACD")));
     }
 }

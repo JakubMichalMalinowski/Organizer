@@ -8,7 +8,7 @@
     <string name="photo">Photo</string>
     <string name="add_picture">Dodaj/zmień obraz</string>
     <string name="del_photo">Usuń obraz</string>
-    <string name="choose_color">Wybierz kolor tła notatek</string>
+    <string name="choose_color">Kolor tła notatek</string>
     <string name="info_and_help">Informacje i pomoc</string>
     <string name="event">Wydarzenie</string>
     <string name="add_event">Dodaj wydarzenie</string>
@@ -21,4 +21,5 @@
     <string name="year">Rok</string>
     <string name="hour">Godzina</string>
     <string name="min">Minuty</string>
+    <string name="weather">Pogoda</string>
 </resources>
