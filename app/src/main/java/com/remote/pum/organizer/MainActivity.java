@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -106,7 +107,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             if (preferences.getBoolean("show_help", true)) {
                 buildHelpBaseAlertDialogBuilder().setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {}
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
                 }).setNegativeButton("Nie pokazuj ponownie", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -196,7 +198,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                     })
                     .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {}
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
                     }).create().show();
 
         }
@@ -229,7 +232,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         if (item.getItemId() == R.id.help) {
             buildHelpBaseAlertDialogBuilder().setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {}
+                public void onClick(DialogInterface dialog, int which) {
+                }
             }).create().show();
         }
 
@@ -297,12 +301,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     }
 
     private void downloadWeather(String location) {
-        final String loc = location.toLowerCase();
+        final String loc = location.toLowerCase().replaceAll("\\s", "");
         final Context context = this;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
+
+
                 URL imgw;
                 HttpURLConnection imgwConnection = null;
 
@@ -313,20 +319,42 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                     if (imgwConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                         InputStreamReader reader = new InputStreamReader(imgwConnection.getInputStream());
                         final Weather weather = gson.fromJson(reader, Weather.class);
+                        final View view = getLayoutInflater().inflate(R.layout.weather_layout, null, false);
+
+                        ((TextView) view.findViewById(R.id.weather_date_and_time)).setText(String.format(" Czas pomiaru: %s\t%s:00", weather.getData_pomiaru(), weather.getGodzina_pomiaru()));
+                        ((TextView) view.findViewById(R.id.weather_temperature)).setText(String.format(" Temperatura: %s", weather.getTemperatura()));
+                        ((TextView) view.findViewById(R.id.weather_wind_velocity)).setText(String.format(" Prędkość: %s", weather.getPredkosc_wiatru()));
+                        ((TextView) view.findViewById(R.id.weather_wind_direction)).setText(String.format(" Kierunek: %s", weather.getKierunek_wiatru()));
+                        ((TextView) view.findViewById(R.id.weather_humidity)).setText(String.format(" Wilgotność względna: %s", weather.getWilgotnosc_wzgledna()));
+                        ((TextView) view.findViewById(R.id.weather_rain)).setText(String.format(" Suma opadu: %s", weather.getSuma_opadu()));
+                        ((TextView) view.findViewById(R.id.weather_pressure)).setText(String.format(" Ciśnienie: %s", weather.getCisnienie()));
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 new AlertDialog.Builder(context).setTitle("Pogoda dla: " + weather.getStacja())
-                                        .setMessage("Temperatura: " + weather.getTemperatura() +
-                                                "\n Opady: " + weather.getSuma_opadu())
+                                        .setView(view)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onClick(DialogInterface dialog, int which) {}
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
                                         }).create().show();
                             }
                         });
 
+                    } else if (imgwConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new AlertDialog.Builder(context).setTitle("Błąd")
+                                        .setMessage("Stacja nie została znaleziona. Proszę sprawdzić poprawność nazwy miejscowości lub użyć większej miejscowości.")
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        }).create().show();
+                            }
+                        });
                     } else {
                         throw new IOException();
                     }
@@ -338,7 +366,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                                     .setMessage("Bład przy połączeniu z serwerem dostarczającym informacje pogodowe. Pobranie danych jest niemożliwe.")
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(DialogInterface dialog, int which) {}
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
                                     }).create().show();
                         }
                     });

@@ -22,4 +22,5 @@
     <string name="hour">Godzina</string>
     <string name="min">Minuty</string>
     <string name="weather">Pogoda</string>
+    <string name="wind">\u0020Wiatr</string>
 </resources>
