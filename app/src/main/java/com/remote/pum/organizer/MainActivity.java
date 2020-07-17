@@ -1,5 +1,6 @@
 package com.remote.pum.organizer;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -289,26 +290,30 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     }
 
     private AlertDialog.Builder buildHelpBaseAlertDialogBuilder() {
-        return new AlertDialog.Builder(this).setTitle("Informacje i pomoc")
+        return new AlertDialog.Builder(this).setTitle("Informacje i pomoc (proszę się dokładnie zapoznać)")
                 .setMessage("Aplikacja umożliwiwa dodawanie różnego typu notatek, np. \"szybkich\" które są reprezentowane tylko tytułem. " +
                         "Po dotknięciu takiej notatki możliwa jest jej edycja i rozbudowanie jej o opis oraz dodanie obrazka. " +
                         "Do danej notatki możliwe jest także dodawanie wydarzenia poprzez dotknięcie odpowiedniego przycisku. " +
                         "W wydarzeniu możemy modyfikować datę wraz z godziną i lokalizację. " +
                         "Zapis danej notatki po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
                         "Usunięcie następuje poprzez przesuniecie danej notatki poziomo w linii prostej w prawo bądż lewo. " +
+                        "Z poziomu aplikacji możliwe jest także sprawdzenie ostatnich zanotowanych danych meteorologicznych dla wybranej miejscowości, po klinknięciu na odpowiednią opcję menu głównego. " +
                         "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +
-                        "W razie wątpliwości można wrócić do tej informacji poprzez dotknięcie znaku zapytania w górnej belce aplikacji. ");
+                        "W razie wątpliwości można wrócić do tej informacji poprzez wybranie opcji \"Informacje i pomoc\" lub (?) (w zależności sposobu wyświetlania) w górnej belce aplikacji. " +
+                        "\n\nAutorzy:\nMonika Jakubiec\nJakub Malinowski\n\nVersion: 2.0");
     }
 
     private void downloadWeather(String location) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Czekaj, trwa pobieranie...");
+        progressDialog.show();
+
         final String loc = location.toLowerCase().replaceAll("\\s", "");
         final Context context = this;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-
-
                 URL imgw;
                 HttpURLConnection imgwConnection = null;
 
@@ -332,6 +337,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                progressDialog.dismiss();
                                 new AlertDialog.Builder(context).setTitle("Pogoda dla: " + weather.getStacja())
                                         .setView(view)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -346,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                progressDialog.dismiss();
                                 new AlertDialog.Builder(context).setTitle("Błąd")
                                         .setMessage("Stacja nie została znaleziona. Proszę sprawdzić poprawność nazwy miejscowości lub użyć większej miejscowości.")
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -362,6 +369,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            progressDialog.dismiss();
                             new AlertDialog.Builder(context).setTitle("Błąd")
                                     .setMessage("Bład przy połączeniu z serwerem dostarczającym informacje pogodowe. Pobranie danych jest niemożliwe.")
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -374,6 +382,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 } finally {
                     if (imgwConnection != null) {
                         imgwConnection.disconnect();
+                    }
+
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
                     }
                 }
             }
