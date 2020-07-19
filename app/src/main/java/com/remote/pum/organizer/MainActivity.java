@@ -292,11 +292,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     private AlertDialog.Builder buildHelpBaseAlertDialogBuilder() {
         return new AlertDialog.Builder(this).setTitle("Informacje i pomoc (proszę się dokładnie zapoznać)")
                 .setMessage("Aplikacja umożliwiwa dodawanie różnego typu notatek, np. \"szybkich\" które są reprezentowane tylko tytułem. " +
-                        "Po dotknięciu takiej notatki możliwa jest jej edycja i rozbudowanie jej o opis oraz dodanie obrazka. " +
+                        "Po dotknięciu takiej notatki możliwa jest jej edycja i rozbudowanie jej o opis oraz dodanie/zmiana/usuwanie obrazka. " +
                         "Do danej notatki możliwe jest także dodawanie wydarzenia poprzez dotknięcie odpowiedniego przycisku. " +
                         "W wydarzeniu możemy modyfikować datę wraz z godziną i lokalizację. " +
                         "Zapis danej notatki po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
-                        "Usunięcie następuje poprzez przesuniecie danej notatki poziomo w linii prostej w prawo bądż lewo. " +
+                        "Usunięcie następuje poprzez przesuniecie danej notatki poziomo w linii prostej w prawo bądż lewo w widoku ekranu głównego. " +
+                        "Umożliwiono także zmianę koloru tła notatek. " +
                         "Z poziomu aplikacji możliwe jest także sprawdzenie ostatnich zanotowanych danych meteorologicznych dla wybranej miejscowości, po klinknięciu na odpowiednią opcję menu głównego. " +
                         "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +
                         "W razie wątpliwości można wrócić do tej informacji poprzez wybranie opcji \"Informacje i pomoc\" lub (?) (w zależności sposobu wyświetlania) w górnej belce aplikacji. " +
