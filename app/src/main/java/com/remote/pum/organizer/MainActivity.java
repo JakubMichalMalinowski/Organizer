@@ -41,9 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Główne Activity aplikacji
+ *
  * @author Monika Jakubiec
  * @author Jakub Malinowski
- * Główne Activity aplikacji
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewListener {
     private RecyclerView notesRecyclerView;
