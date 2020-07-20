@@ -22,7 +22,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Activity obsługujące wydarzenia
+ */
 public class EventActivity extends AppCompatActivity {
+    //tablice i lista przechowująca elementy do spinnerów
     private static final Integer[] YEARS = new Integer[100];
     private static final Integer[] MONTHS = new Integer[12];
     private static final List<Integer> DAYS = new ArrayList<>();
@@ -56,6 +60,8 @@ public class EventActivity extends AppCompatActivity {
                 locationTextView.setText(R.string.no_data);
             }
 
+            //uzupełnianie tablic i listy danymi
+
             for (int i = 0; i < YEARS.length; ++i) {
                 YEARS[i] = i + 2000;
             }
@@ -80,6 +86,12 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Inicjalizacja zawartości menu opcji
+     *
+     * @param menu menu, w którym umieszczamy zawartość
+     * @return true - aby pokazać menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -87,8 +99,15 @@ public class EventActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Rozpoznanie wybranej opcji w menu
+     *
+     * @param item wybrana opcja
+     * @return true - jezeli skonsumowane
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //edycja daty
         if (item.getItemId() == R.id.edit_date_menu_item) {
             View view = LayoutInflater.from(this).inflate(R.layout.edit_date_layout, null, false);
 
@@ -133,10 +152,10 @@ public class EventActivity extends AppCompatActivity {
                 }
             });
 
-            final Spinner hourSpinner = (Spinner)view.findViewById(R.id.hour_spinner);
+            final Spinner hourSpinner = view.findViewById(R.id.hour_spinner);
             hourSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, HOURS));
 
-            final Spinner minSpinner = (Spinner)view.findViewById(R.id.min_spinner);
+            final Spinner minSpinner = view.findViewById(R.id.min_spinner);
             minSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, MINS));
 
             if (note.getDate() == null) {
@@ -166,6 +185,7 @@ public class EventActivity extends AppCompatActivity {
                     }).create().show();
         }
 
+        //edycja lokalizacji
         if (item.getItemId() == R.id.edit_location_menu_item) {
             final View view = getLayoutInflater().inflate(R.layout.edit_location_layout, null, false);
             final EditText locationEditText = view.findViewById(R.id.location_edit_text);
@@ -200,14 +220,24 @@ public class EventActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Ustawienie ilości dni w zależności od miesiąca i roku
+     *
+     * @param yearSpinner  spinner wskazujący rok
+     * @param monthSpinner spinner wskazujący miesiąc
+     * @param daySpinner   spinner wskazujący dzień
+     */
     private void setDaysNumber(Spinner yearSpinner, Spinner monthSpinner, Spinner daySpinner) {
         int month = ((int) monthSpinner.getSelectedItem());
         int year = ((int) yearSpinner.getSelectedItem());
 
+        //miesiące z 31 dniami
         if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
             daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS));
         } else {
+            //luty
             if (month == 2) {
+                //przestępny
                 if ((year % 4) == 0) {
                     daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 29)));
                 } else {
@@ -225,6 +255,9 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Wywoływana gdy użytkownik naciśnie przycisk powrotu, zwracjąca wartość do Activity-rodzica, zwraca notatkę z modyfikacjami wydarzenia
+     */
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();

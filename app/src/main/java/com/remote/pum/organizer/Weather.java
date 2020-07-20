@@ -1,5 +1,8 @@
 package com.remote.pum.organizer;
 
+/**
+ * Klasa potrzebna do parsowania JSON pobranego z IMGW na temat warunków meteorologicznych
+ */
 public class Weather {
     private String id_stacji;
     private String stacja;

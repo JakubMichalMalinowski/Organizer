@@ -21,6 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+/**
+ * Activity służące do modyfikacji notatki
+ */
 public class NoteActivity extends AppCompatActivity {
     private static final int PICTURE_REQUEST = 1;
     private static final int EVENT_REQUEST = 2;
@@ -56,6 +59,9 @@ public class NoteActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Wywoływana gdy użytkownik naciśnie przycisk powrotu, ustawiająca tytuł i zawartość do notatki i zwraca tą notatkę do Activity-rodzica
+     */
     @Override
     public void onBackPressed() {
         if (note != null) {
@@ -70,6 +76,12 @@ public class NoteActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    /**
+     * Inicjalizacja zawartości menu opcji
+     *
+     * @param menu menu, w którym umieszczamy zawartość
+     * @return true - aby pokazać menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -77,8 +89,15 @@ public class NoteActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Rozpoznanie wybranej opcji w menu
+     *
+     * @param item wybrana opcja
+     * @return true - jezeli skonsumowane
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //dodanie obrazka do notatki
         if (item.getItemId() == R.id.add_picture_menu_item) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
@@ -87,6 +106,7 @@ public class NoteActivity extends AppCompatActivity {
             }
         }
 
+        //usunięcie obrazka z notatki
         if (item.getItemId() == R.id.remove_picture_menu_item) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Usuwanie obrazu")
@@ -103,6 +123,7 @@ public class NoteActivity extends AppCompatActivity {
                     }).create().show();
         }
 
+        //dodanie zdarzenia do notatki
         if (item.getItemId() == R.id.add_event_menu_item) {
             Intent intent = new Intent(this, EventActivity.class);
             intent.putExtra("current_note_for_event", note);
@@ -112,9 +133,17 @@ public class NoteActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Pobranie rezultatu z zamykanego Activity
+     *
+     * @param requestCode kod zapytania
+     * @param resultCode  kod wyniku
+     * @param data        Intent zawierające zwrócone dane
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //wybór obrazu
         if (requestCode == PICTURE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             String result;
             Cursor cursor = getContentResolver().query(data.getData(), null, null, null, null);
@@ -130,6 +159,7 @@ public class NoteActivity extends AppCompatActivity {
             note.setPicture(result);
         }
 
+        //Activity modyfikujące wydarzenie
         if (requestCode == EVENT_REQUEST && resultCode == RESULT_OK && data != null) {
             Note returnNote = (Note) data.getSerializableExtra("note_return_from_event");
             if (returnNote != null) {
@@ -139,6 +169,9 @@ public class NoteActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Uruchomienie Activity odpowiedzialnego za wybranie obrazu
+     */
     private void choosePicture() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -147,6 +180,13 @@ public class NoteActivity extends AppCompatActivity {
         startActivityForResult(intent, PICTURE_REQUEST);
     }
 
+    /**
+     * Wywoływana jako rezultat zapytania o udzielenie pozwoleń
+     *
+     * @param requestCode  kod zapytania
+     * @param permissions  zapytane pozwolenia
+     * @param grantResults wyniki czy zostały udzielone pozwolenia czy nie
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

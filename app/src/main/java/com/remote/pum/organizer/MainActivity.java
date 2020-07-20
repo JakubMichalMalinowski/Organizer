@@ -40,6 +40,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Monika Jakubiec
+ * @author Jakub Malinowski
+ * Główne Activity aplikacji
+ */
 public class MainActivity extends AppCompatActivity implements RecyclerViewListener {
     private RecyclerView notesRecyclerView;
     private NotesRecyclerViewAdapter notesRecyclerViewAdapter;
@@ -59,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
 
             try {
                 created = data.createNewFile();
-                //throw new IOException();
             } catch (IOException e) {
                 closeAppWithFileError("Nie udało sie utworzyć pliku.").show();
             }
@@ -120,6 +124,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         }
     }
 
+    /**
+     * Metoda informująca użytkownika o błędzie i zamykająca aplikację
+     *
+     * @param additionalInfo dodatkowe informacje do wyświetlenia dla użytkownika
+     * @return obiekt klasy AlertDialog, czyli okno dialogowe wyświetlające informacje dla użytkownika
+     */
     private AlertDialog closeAppWithFileError(String additionalInfo) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Błąd dostępu do danych, uruchom aplikację ponownie, a w przypadku niepowodzenia wyczyść dane aplikacji.\n" + additionalInfo);
@@ -132,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         return builder.create();
     }
 
+    /**
+     * Zapis danych do pamięci
+     */
     private void saveData() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(data))) {
             objectOutputStream.writeObject(notes);
@@ -141,6 +154,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         }
     }
 
+    /**
+     * Inicjalizacja zawartości menu opcji
+     *
+     * @param menu menu, w którym umieszczamy zawartość
+     * @return true - aby pokazać menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -148,8 +167,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         return true;
     }
 
+    /**
+     * Rozpoznanie wybranej opcji w menu
+     *
+     * @param item wybrana opcja
+     * @return true - jezeli skonsumowane
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //nowa notatka
         if (item.getItemId() == R.id.new_note) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Tytuł notatki");
@@ -180,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             builder.create().show();
         }
 
+        //pogoda
         if (item.getItemId() == R.id.last_weather) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             View view = getLayoutInflater().inflate(R.layout.weather_location_layout, null, false);
@@ -205,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
 
         }
 
+        //wybór koloru tła notatek
         if (item.getItemId() == R.id.choose_color) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
 
@@ -230,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                     .show();
         }
 
+        //informacje i pomoc
         if (item.getItemId() == R.id.help) {
             buildHelpBaseAlertDialogBuilder().setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
@@ -241,6 +270,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         return true;
     }
 
+    /**
+     * Pobranie rezultatu z zamykanego Activity
+     *
+     * @param requestCode kod zapytania
+     * @param resultCode  kod wyniku
+     * @param data        Intent zawierające zwrócone dane
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (data != null) {
@@ -261,6 +297,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Klikniecie powodujące przejście w tryb modyfikacji notatki
+     *
+     * @param view     element wywołujący
+     * @param position pozycja notatki
+     */
     @Override
     public void onModifyClick(View view, int position) {
         Intent intent = new Intent(this, NoteActivity.class);
@@ -268,6 +310,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         startActivityForResult(intent, position);
     }
 
+    /**
+     * Ruch powodujący usunięcie notatki
+     *
+     * @param view     element wywołujący
+     * @param position pozycja notatki
+     */
     @Override
     public void onDeleteMotion(View view, final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -289,6 +337,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 }).create().show();
     }
 
+    /**
+     * Zbudowanie bazowego okna dialogowego z informacjami i pomocą
+     *
+     * @return obiekt AlertDialog.Builder z którego należy utworzyć okno dialogowe i je wyświetlić
+     */
     private AlertDialog.Builder buildHelpBaseAlertDialogBuilder() {
         return new AlertDialog.Builder(this).setTitle("Informacje i pomoc (proszę się dokładnie zapoznać)")
                 .setMessage("Aplikacja umożliwiwa dodawanie różnego typu notatek, np. \"szybkich\" które są reprezentowane tylko tytułem. " +
@@ -304,11 +357,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                         "\n\nAutorzy:\nMonika Jakubiec\nJakub Malinowski\n\nVersion: 2.0");
     }
 
+    /**
+     * Pobieranie pogody dla podanej lokalizacji
+     *
+     * @param location lokalizacja dla której pobierania jest pogoda
+     */
     private void downloadWeather(String location) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Czekaj, trwa pobieranie...");
         progressDialog.show();
 
+        //usunięcie spacji i zamiana wszystkich liter na małe
         final String loc = location.toLowerCase().replaceAll("\\s", "");
         final Context context = this;
 
