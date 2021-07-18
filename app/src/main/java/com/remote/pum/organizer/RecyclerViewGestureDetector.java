@@ -1,5 +1,6 @@
 package com.remote.pum.organizer;
 
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,23 +13,10 @@ public class RecyclerViewGestureDetector extends GestureDetector.SimpleOnGesture
     private View view;
     private int position;
 
-    /**
-     * Przesunięcie notatki w lewo lub prawo
-     *
-     * @param e1        dotknięcie, rozpoczynające ruch
-     * @param e2        przesunięcie
-     * @param velocityX predkość wzdłuż osi x
-     * @param velocityY predkosc wzdłuż osi y
-     * @return true, jeżeli skonsumowane
-     */
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if (Math.abs(e1.getX() - e2.getX()) > 10) {
-            recyclerViewListener.onDeleteMotion(view, position);
-            return true;
-        }
-
-        return false;
+    public void onLongPress(MotionEvent e) {
+        super.onLongPress(e);
+        recyclerViewListener.onDeleteMotion(view, position);
     }
 
     /**
