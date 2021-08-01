@@ -24,12 +24,12 @@ import androidx.core.content.ContextCompat;
 /**
  * Activity służące do modyfikacji notatki
  */
-public class NoteActivity extends AppCompatActivity {
+public class DeviceActivity extends AppCompatActivity {
     private static final int PICTURE_REQUEST = 1;
     private static final int EVENT_REQUEST = 2;
     private static final int PERMISSION_REQUEST = 3;
 
-    private Note note;
+    private Device device;
 
     private EditText titleEditText;
     private EditText contentEditText;
@@ -37,22 +37,22 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note);
+        setContentView(R.layout.activity_device);
 
-        note = (Note) getIntent().getSerializableExtra("current_note");
+        device = (Device) getIntent().getSerializableExtra("current_note");
 
         titleEditText = findViewById(R.id.title_edit_text_note_activity);
         contentEditText = findViewById(R.id.content_edit_text_note_activity);
 
-        if (note != null) {
-            if (note.getTitle() != null) {
-                titleEditText.setText(note.getTitle());
+        if (device != null) {
+            if (device.getName() != null) {
+                titleEditText.setText(device.getName());
             } else {
                 titleEditText.setText("");
             }
 
-            if (note.getContent() != null) {
-                contentEditText.setText(note.getContent());
+            if (device.getNote() != null) {
+                contentEditText.setText(device.getNote());
             } else {
                 contentEditText.setText("");
             }
@@ -64,13 +64,13 @@ public class NoteActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (note != null) {
-            note.setTitle(titleEditText.getText().toString());
-            note.setContent(contentEditText.getText().toString());
+        if (device != null) {
+            device.setName(titleEditText.getText().toString());
+            device.setNote(contentEditText.getText().toString());
         }
 
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("return_note", note);
+        returnIntent.putExtra("return_note", device);
         setResult(RESULT_OK, returnIntent);
 
         super.onBackPressed();
@@ -85,7 +85,7 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.note_menu, menu);
+        inflater.inflate(R.menu.device_menu, menu);
         return true;
     }
 
@@ -114,7 +114,7 @@ public class NoteActivity extends AppCompatActivity {
                     .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            note.setPicture(null);
+                            device.setPicture(null);
                         }
                     })
                     .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
@@ -125,8 +125,8 @@ public class NoteActivity extends AppCompatActivity {
 
         //dodanie zdarzenia do notatki
         if (item.getItemId() == R.id.add_event_menu_item) {
-            Intent intent = new Intent(this, EventActivity.class);
-            intent.putExtra("current_note_for_event", note);
+            Intent intent = new Intent(this, DetailsActivity.class);
+            intent.putExtra("current_note_for_event", device);
             startActivityForResult(intent, EVENT_REQUEST);
         }
 
@@ -156,15 +156,15 @@ public class NoteActivity extends AppCompatActivity {
                 cursor.close();
             }
 
-            note.setPicture(result);
+            device.setPicture(result);
         }
 
         //Activity modyfikujące wydarzenie
         if (requestCode == EVENT_REQUEST && resultCode == RESULT_OK && data != null) {
-            Note returnNote = (Note) data.getSerializableExtra("note_return_from_event");
-            if (returnNote != null) {
-                this.note.setDate(returnNote.getDateDate());
-                this.note.setLocation(returnNote.getLocation());
+            Device returnDevice = (Device) data.getSerializableExtra("note_return_from_event");
+            if (returnDevice != null) {
+                this.device.setDate(returnDevice.getDateDate());
+                this.device.setLocation(returnDevice.getLocation());
             }
         }
     }

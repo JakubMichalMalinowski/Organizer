@@ -10,8 +10,8 @@
 
     <item
         android:id="@+id/add_event_menu_item"
-        android:icon="@drawable/ic_add_event"
-        android:title="@string/add_event"
+        android:icon="@drawable/ic_add_details"
+        android:title="@string/add_details"
         app:showAsAction="ifRoom"/>
 
     <item

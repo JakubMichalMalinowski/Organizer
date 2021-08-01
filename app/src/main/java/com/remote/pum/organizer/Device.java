@@ -10,35 +10,35 @@ import java.util.Locale;
 /**
  * Notatka
  */
-public class Note implements Serializable {
-    private String title;
-    private String content;
+public class Device implements Serializable {
+    private String name;
+    private String note;
     private String picture;
     private Date date;
     private String location;
 
-    public Note(String title) {
-        this.title = title;
-        this.content = "";
+    public Device(String name) {
+        this.name = name;
+        this.note = "";
         this.picture = null;
         this.date = null;
         this.location = "";
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public String getContent() {
-        return content;
+    public String getNote() {
+        return note;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getPicture() {

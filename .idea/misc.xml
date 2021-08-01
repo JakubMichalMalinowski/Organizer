@@ -5,6 +5,10 @@
       <map>
         <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/activity_event.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/edit_location_layout.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/note_layout.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/note_layout_with_content.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/note_layout_with_picture.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/menu/main_menu.xml" value="0.36666666666666664" />
       </map>
     </option>
   </component>

@@ -4,9 +4,9 @@
 
     <item
         android:id="@+id/new_note"
-        android:title="@string/new_note"
+        android:title="@string/new_device"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_add_note" />
+        android:icon="@drawable/ic_add_device" />
 
     <item
         android:id="@+id/last_weather"

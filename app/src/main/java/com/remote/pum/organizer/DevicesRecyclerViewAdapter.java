@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * Adapter wiążący dane (notatki) z RecyclerView
  */
-public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecyclerViewAdapter.ViewHolder> {
-    private List<Note> notes;
+public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecyclerViewAdapter.ViewHolder> {
+    private List<Device> devices;
     private GestureDetector gestureDetector;
     private AlertDialog pictureNotExistAlertDialog;
     private SharedPreferences preferences;
@@ -36,10 +36,10 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
      *
      * @param context     kontekst
      * @param preferences zapisane ustawienia
-     * @param notes       lista notatek
+     * @param devices       lista notatek
      */
-    public NotesRecyclerViewAdapter(Context context, SharedPreferences preferences, List<Note> notes) {
-        this.notes = notes;
+    public DevicesRecyclerViewAdapter(Context context, SharedPreferences preferences, List<Device> devices) {
+        this.devices = devices;
         this.preferences = preferences;
         recyclerViewGestureDetector = new RecyclerViewGestureDetector();
         gestureDetector = new GestureDetector(context, recyclerViewGestureDetector);
@@ -63,18 +63,18 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //tylko tytuł
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_layout, parent, false);
 
         switch (viewType) {
             //tytuł, opis, obraz
             case 2:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_layout_with_picture, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_layout_with_picture, parent, false);
                 setColor(view);
                 return new ViewHolderWithPicture(view);
 
             //tytuł i opis
             case 1:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_layout_with_content, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_layout_with_content, parent, false);
                 setColor(view);
                 return new ViewHolderWithContent(view);
         }
@@ -94,7 +94,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
         switch (holder.getItemViewType()) {
             //obraz
             case 2:
-                File photo = new File(notes.get(position).getPicture());
+                File photo = new File(devices.get(position).getPicture());
                 if (photo.exists()) {
                     ((ViewHolderWithPicture) holder).imageView.setImageURI(Uri.parse(photo.toString()));
                 } else {
@@ -103,11 +103,11 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
 
                 //opis
             case 1:
-                ((ViewHolderWithContent) holder).contentTextView.setText(notes.get(position).getContent());
+                ((ViewHolderWithContent) holder).contentTextView.setText(devices.get(position).getNote());
 
                 //tytuł
             case 0:
-                holder.titleTextView.setText(notes.get(position).getTitle());
+                holder.titleTextView.setText(devices.get(position).getName());
         }
 
         holder.itemView.setOnTouchListener(new View.OnTouchListener() {
@@ -129,7 +129,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
      */
     @Override
     public int getItemCount() {
-        return notes.size();
+        return devices.size();
     }
 
     /**
@@ -147,7 +147,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
     /**
      * Notatka z tytułem i opisem na danej pozycji RecyclerView
      */
-    public static class ViewHolderWithContent extends NotesRecyclerViewAdapter.ViewHolder {
+    public static class ViewHolderWithContent extends DevicesRecyclerViewAdapter.ViewHolder {
         private TextView contentTextView;
 
         public ViewHolderWithContent(@NonNull View itemView) {
@@ -159,7 +159,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
     /**
      * Notatka z tytułem, opisem i obrazkiem na danej pozycji RecyclerView
      */
-    public static class ViewHolderWithPicture extends NotesRecyclerViewAdapter.ViewHolderWithContent {
+    public static class ViewHolderWithPicture extends DevicesRecyclerViewAdapter.ViewHolderWithContent {
         private ImageView imageView;
 
         public ViewHolderWithPicture(@NonNull View itemView) {
@@ -185,11 +185,11 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
      */
     @Override
     public int getItemViewType(int position) {
-        if (notes.get(position).getPicture() != null) {
+        if (devices.get(position).getPicture() != null) {
             return 2;
         }
 
-        if (!notes.get(position).getContent().equals("")) {
+        if (!devices.get(position).getNote().equals("")) {
             return 1;
         }
 

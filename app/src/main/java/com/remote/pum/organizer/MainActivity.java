@@ -48,9 +48,9 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewListener {
     private RecyclerView notesRecyclerView;
-    private NotesRecyclerViewAdapter notesRecyclerViewAdapter;
+    private DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     private File data;
-    private List<Note> notes;
+    private List<Device> devices;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -80,15 +80,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 });
                 builder.create().show();
 
-                notes = new ArrayList<>();
+                devices = new ArrayList<>();
                 saveData();
             } else {
                 closeAppWithFileError("Nie udało się utworzyć pliku.").show();
             }
         } else {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(data))) {
-                notes = (List<Note>) objectInputStream.readObject();
-                if (!notes.isEmpty()) {
+                devices = (List<Device>) objectInputStream.readObject();
+                if (!devices.isEmpty()) {
                     Toast.makeText(this, "Załadowano notatki", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(this, "Brak notatek", Toast.LENGTH_LONG).show();
@@ -98,16 +98,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             }
         }
 
-        if (notes != null) {
+        if (devices != null) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
 
             notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
 
-            notesRecyclerViewAdapter = new NotesRecyclerViewAdapter(this, preferences, notes);
-            notesRecyclerViewAdapter.setRecyclerViewListener(this);
+            devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(this, preferences, devices);
+            devicesRecyclerViewAdapter.setRecyclerViewListener(this);
 
             notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            notesRecyclerView.setAdapter(notesRecyclerViewAdapter);
+            notesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
             notesRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
             if (preferences.getBoolean("show_help", true)) {
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
      */
     private void saveData() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(data))) {
-            objectOutputStream.writeObject(notes);
+            objectOutputStream.writeObject(devices);
             Toast.makeText(this, "Zapisano", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             closeAppWithFileError("Błąd zapisu danych.").show();
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Tytuł notatki");
 
-            final View view = getLayoutInflater().inflate(R.layout.add_note_layout, null);
+            final View view = getLayoutInflater().inflate(R.layout.add_device_layout, null);
             builder.setView(view);
 
             builder.setPositiveButton("Zapisz", new DialogInterface.OnClickListener() {
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                     EditText titleEditText = view.findViewById(R.id.title_edit_text);
                     String title = titleEditText.getText().toString();
                     if (!title.equals("")) {
-                        notes.add(new Note(title));
+                        devices.add(new Device(title));
                         saveData();
                     } else {
                         Toast.makeText(getApplicationContext(), "Anulowano. Wprowadzono pusty tytuł", Toast.LENGTH_LONG).show();
@@ -281,18 +281,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (data != null) {
-            Note note = (Note) data.getSerializableExtra("return_note");
+            Device device = (Device) data.getSerializableExtra("return_note");
 
-            if (note != null) {
-                notes.get(requestCode).setTitle(note.getTitle());
-                notes.get(requestCode).setContent(note.getContent());
-                notes.get(requestCode).setPicture(note.getPicture());
-                notes.get(requestCode).setDate(note.getDateDate());
-                notes.get(requestCode).setLocation(note.getLocation());
+            if (device != null) {
+                devices.get(requestCode).setName(device.getName());
+                devices.get(requestCode).setNote(device.getNote());
+                devices.get(requestCode).setPicture(device.getPicture());
+                devices.get(requestCode).setDate(device.getDateDate());
+                devices.get(requestCode).setLocation(device.getLocation());
             }
         }
 
-        notesRecyclerViewAdapter.notifyItemChanged(requestCode);
+        devicesRecyclerViewAdapter.notifyItemChanged(requestCode);
         saveData();
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -306,8 +306,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
      */
     @Override
     public void onModifyClick(View view, int position) {
-        Intent intent = new Intent(this, NoteActivity.class);
-        intent.putExtra("current_note", notes.get(position));
+        Intent intent = new Intent(this, DeviceActivity.class);
+        intent.putExtra("current_note", devices.get(position));
         startActivityForResult(intent, position);
     }
 
@@ -325,9 +325,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        notes.remove(position);
-                        notesRecyclerViewAdapter.notifyItemRemoved(position);
-                        notesRecyclerViewAdapter.notifyItemRangeChanged(0, notes.size());
+                        devices.remove(position);
+                        devicesRecyclerViewAdapter.notifyItemRemoved(position);
+                        devicesRecyclerViewAdapter.notifyItemRangeChanged(0, devices.size());
                         saveData();
                     }
                 })

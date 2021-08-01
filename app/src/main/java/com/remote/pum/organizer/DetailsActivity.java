@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Activity obsługujące wydarzenia
  */
-public class EventActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity {
     //tablice i lista przechowująca elementy do spinnerów
     private static final Integer[] YEARS = new Integer[100];
     private static final Integer[] MONTHS = new Integer[12];
@@ -35,28 +35,28 @@ public class EventActivity extends AppCompatActivity {
     private static final Integer[] HOURS = new Integer[24];
     private static final Integer[] MINS = new Integer[60];
 
-    private Note note;
+    private Device device;
     private TextView dateTextView;
     private TextView locationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event);
+        setContentView(R.layout.activity_details);
 
         dateTextView = findViewById(R.id.date_text_view);
         locationButton = findViewById(R.id.location_button);
 
-        note = (Note) getIntent().getSerializableExtra("current_note_for_event");
+        device = (Device) getIntent().getSerializableExtra("current_note_for_event");
 
-        if (note != null) {
-            if (note.getDate() != null) {
-                dateTextView.setText(note.getDate());
+        if (device != null) {
+            if (device.getDate() != null) {
+                dateTextView.setText(device.getDate());
             } else {
                 dateTextView.setText(R.string.no_data);
             }
 
-            if (note.getLocation() != null && !note.getLocation().equals("")) {
+            if (device.getLocation() != null && !device.getLocation().equals("")) {
                 setLocation();
             } else {
                 unsetLocation();
@@ -97,7 +97,7 @@ public class EventActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.event_menu, menu);
+        inflater.inflate(R.menu.details_menu, menu);
         return true;
     }
 
@@ -122,12 +122,12 @@ public class EventActivity extends AppCompatActivity {
             final Spinner daySpinner = view.findViewById(R.id.day_spinner);
             setDaysNumber(yearSpinner, monthSpinner, daySpinner);
 
-            if (note.getDate() == null) {
+            if (device.getDate() == null) {
                 yearSpinner.setSelection(Calendar.getInstance().get(Calendar.YEAR) - 2000);
                 monthSpinner.setSelection(Calendar.getInstance().get(Calendar.MONTH));
             } else {
-                yearSpinner.setSelection(note.getDateYear() - 2000);
-                monthSpinner.setSelection(note.getDateMonth());
+                yearSpinner.setSelection(device.getDateYear() - 2000);
+                monthSpinner.setSelection(device.getDateMonth());
             }
 
             yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -160,12 +160,12 @@ public class EventActivity extends AppCompatActivity {
             final Spinner minSpinner = view.findViewById(R.id.min_spinner);
             minSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, MINS));
 
-            if (note.getDate() == null) {
+            if (device.getDate() == null) {
                 hourSpinner.setSelection(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
                 minSpinner.setSelection(Calendar.getInstance().get(Calendar.MINUTE));
             } else {
-                hourSpinner.setSelection(note.getDateHour());
-                minSpinner.setSelection(note.getDateMin());
+                hourSpinner.setSelection(device.getDateHour());
+                minSpinner.setSelection(device.getDateMin());
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -174,14 +174,14 @@ public class EventActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            note.setDate((int) yearSpinner.getSelectedItem(), (int) monthSpinner.getSelectedItem(), (int) daySpinner.getSelectedItem(), (int) hourSpinner.getSelectedItem(), (int) minSpinner.getSelectedItem());
-                            dateTextView.setText(note.getDate());
+                            device.setDate((int) yearSpinner.getSelectedItem(), (int) monthSpinner.getSelectedItem(), (int) daySpinner.getSelectedItem(), (int) hourSpinner.getSelectedItem(), (int) minSpinner.getSelectedItem());
+                            dateTextView.setText(device.getDate());
                         }
                     })
                     .setNegativeButton("Usuń datę", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            note.setDate(null);
+                            device.setDate(null);
                             dateTextView.setText(R.string.no_data);
                         }
                     }).create().show();
@@ -192,8 +192,8 @@ public class EventActivity extends AppCompatActivity {
             final View view = getLayoutInflater().inflate(R.layout.edit_location_layout, null, false);
             final EditText locationEditText = view.findViewById(R.id.location_edit_text);
 
-            if (note.getLocation() != null && !note.getLocation().equals("")) {
-                locationEditText.setText(note.getLocation());
+            if (device.getLocation() != null && !device.getLocation().equals("")) {
+                locationEditText.setText(device.getLocation());
             }
 
             new AlertDialog.Builder(this).setTitle("Lokalizacja")
@@ -201,9 +201,9 @@ public class EventActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            note.setLocation(locationEditText.getText().toString());
+                            device.setLocation(locationEditText.getText().toString());
 
-                            if (note.getLocation().equals("")) {
+                            if (device.getLocation().equals("")) {
                                 unsetLocation();
                             } else {
                                 setLocation();
@@ -213,7 +213,7 @@ public class EventActivity extends AppCompatActivity {
                     .setNegativeButton("Usuń lokalizację", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            note.setLocation("");
+                            device.setLocation("");
                             unsetLocation();
                         }
                     }).create().show();
@@ -223,8 +223,8 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private void setLocation() {
-        final String url = "https://www.google.com/maps/search/?api=1&query=" + note.getLocation();
-        locationButton.setText(note.getLocation());
+        final String url = "https://www.google.com/maps/search/?api=1&query=" + device.getLocation();
+        locationButton.setText(device.getLocation());
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -271,10 +271,10 @@ public class EventActivity extends AppCompatActivity {
             }
         }
 
-        if (note.getDate() == null) {
+        if (device.getDate() == null) {
             daySpinner.setSelection(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
         } else {
-            daySpinner.setSelection(note.getDateDay() - 1);
+            daySpinner.setSelection(device.getDateDay() - 1);
         }
     }
 
@@ -284,7 +284,7 @@ public class EventActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        intent.putExtra("note_return_from_event", note);
+        intent.putExtra("note_return_from_event", device);
         setResult(RESULT_OK, intent);
 
         super.onBackPressed();
