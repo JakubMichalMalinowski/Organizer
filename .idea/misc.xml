@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/activity_event.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidStudioProjects/Organizer/app/src/main/res/layout/edit_location_layout.xml" value="0.36666666666666664" />
+      </map>
+    </option>
+  </component>
   <component name="JavadocGenerationManager">
-    <option name="OUTPUT_DIRECTORY" value="D:/Users/jakub/Documents/Dokumenty Politechnika Śląska/4 Semestr/Programowanie urządzeń mobilnych/JavaDoc" />
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../../Users/jakub/Documents/Dokumenty Politechnika Śląska/4 Semestr/Programowanie urządzeń mobilnych/JavaDoc" />
     <option name="OPTION_SCOPE" value="private" />
     <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="true" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

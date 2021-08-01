@@ -13,7 +13,7 @@
     <string name="event">Wydarzenie</string>
     <string name="add_event">Dodaj wydarzenie</string>
     <string name="date">Data:</string>
-    <string name="location">Miejscowość:</string>
+    <string name="location">Lokalizacja:</string>
     <string name="edit_date">Edytuj datę</string>
     <string name="edit_location">Edytuj miejscowość</string>
     <string name="day">Dzień</string>

@@ -2,6 +2,7 @@ package com.remote.pum.organizer;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -35,7 +37,7 @@ public class EventActivity extends AppCompatActivity {
 
     private Note note;
     private TextView dateTextView;
-    private TextView locationTextView;
+    private TextView locationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class EventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event);
 
         dateTextView = findViewById(R.id.date_text_view);
-        locationTextView = findViewById(R.id.location_text_view);
+        locationButton = findViewById(R.id.location_button);
 
         note = (Note) getIntent().getSerializableExtra("current_note_for_event");
 
@@ -55,9 +57,9 @@ public class EventActivity extends AppCompatActivity {
             }
 
             if (note.getLocation() != null && !note.getLocation().equals("")) {
-                locationTextView.setText(note.getLocation());
+                setLocation();
             } else {
-                locationTextView.setText(R.string.no_data);
+                unsetLocation();
             }
 
             //uzupełnianie tablic i listy danymi
@@ -202,9 +204,9 @@ public class EventActivity extends AppCompatActivity {
                             note.setLocation(locationEditText.getText().toString());
 
                             if (note.getLocation().equals("")) {
-                                locationTextView.setText(R.string.no_data);
+                                unsetLocation();
                             } else {
-                                locationTextView.setText(note.getLocation());
+                                setLocation();
                             }
                         }
                     })
@@ -212,12 +214,33 @@ public class EventActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             note.setLocation("");
-                            locationTextView.setText(R.string.no_data);
+                            unsetLocation();
                         }
                     }).create().show();
         }
 
         return true;
+    }
+
+    private void setLocation() {
+        final String url = "https://www.google.com/maps/search/?api=1&query=" + note.getLocation();
+        locationButton.setText(note.getLocation());
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            }
+        });
+    }
+
+    private void unsetLocation() {
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), R.string.no_data, Toast.LENGTH_LONG).show();
+            }
+        });
+        locationButton.setText(R.string.no_data);
     }
 
     /**
