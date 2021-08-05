@@ -16,6 +16,7 @@ public class Device implements Serializable {
     private String picture;
     private Date date;
     private String location;
+    private String credentials;
 
     public Device(String name) {
         this.name = name;
@@ -23,6 +24,7 @@ public class Device implements Serializable {
         this.picture = null;
         this.date = null;
         this.location = "";
+        this.credentials = "";
     }
 
     public String getName() {
@@ -55,6 +57,14 @@ public class Device implements Serializable {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(String credentials) {
+        this.credentials = credentials;
     }
 
     /**

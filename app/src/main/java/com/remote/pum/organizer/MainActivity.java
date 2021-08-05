@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 devices.get(requestCode).setPicture(device.getPicture());
                 devices.get(requestCode).setDate(device.getDateDate());
                 devices.get(requestCode).setLocation(device.getLocation());
+                devices.get(requestCode).setCredentials(device.getCredentials());
             }
         }
 

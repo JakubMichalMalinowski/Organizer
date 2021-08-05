@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -159,12 +160,13 @@ public class DeviceActivity extends AppCompatActivity {
             device.setPicture(result);
         }
 
-        //Activity modyfikujące wydarzenie
+        //Activity modyfikujące szczegóły
         if (requestCode == DETAILS_REQUEST && resultCode == RESULT_OK && data != null) {
             Device returnDevice = (Device) data.getSerializableExtra("device_return_from_details");
             if (returnDevice != null) {
                 this.device.setDate(returnDevice.getDateDate());
                 this.device.setLocation(returnDevice.getLocation());
+                this.device.setCredentials(returnDevice.getCredentials());
             }
         }
     }

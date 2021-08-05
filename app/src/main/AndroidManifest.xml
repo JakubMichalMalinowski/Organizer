@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".DetailsActivity"
-            android:label="@string/details"/>
+            android:label="@string/details" />
         <activity
             android:name=".DeviceActivity"
             android:label="@string/device"

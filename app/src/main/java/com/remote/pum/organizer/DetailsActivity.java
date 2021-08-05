@@ -38,6 +38,7 @@ public class DetailsActivity extends AppCompatActivity {
     private Device device;
     private TextView dateTextView;
     private TextView locationButton;
+    private EditText credentialsEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         dateTextView = findViewById(R.id.date_text_view);
         locationButton = findViewById(R.id.location_button);
+        credentialsEditText = findViewById(R.id.credentials_text);
 
         device = (Device) getIntent().getSerializableExtra("current_device_for_details");
 
@@ -60,6 +62,12 @@ public class DetailsActivity extends AppCompatActivity {
                 setLocation();
             } else {
                 unsetLocation();
+            }
+
+            if (device.getCredentials() != null) {
+                credentialsEditText.setText(device.getCredentials());
+            } else {
+                credentialsEditText.setText(R.string.no_data);
             }
 
             //uzupełnianie tablic i listy danymi
@@ -283,6 +291,10 @@ public class DetailsActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
+        if (device != null) {
+            device.setCredentials(credentialsEditText.getText().toString());
+        }
+
         Intent intent = new Intent();
         intent.putExtra("device_return_from_details", device);
         setResult(RESULT_OK, intent);
