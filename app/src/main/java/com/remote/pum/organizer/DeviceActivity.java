@@ -22,11 +22,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 /**
- * Activity służące do modyfikacji notatki
+ * Activity służące do modyfikacji urządzenia
  */
 public class DeviceActivity extends AppCompatActivity {
     private static final int PICTURE_REQUEST = 1;
-    private static final int EVENT_REQUEST = 2;
+    private static final int DETAILS_REQUEST = 2;
     private static final int PERMISSION_REQUEST = 3;
 
     private Device device;
@@ -39,10 +39,10 @@ public class DeviceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
 
-        device = (Device) getIntent().getSerializableExtra("current_note");
+        device = (Device) getIntent().getSerializableExtra("current_device");
 
-        titleEditText = findViewById(R.id.title_edit_text_note_activity);
-        contentEditText = findViewById(R.id.content_edit_text_note_activity);
+        titleEditText = findViewById(R.id.title_edit_text_device_activity);
+        contentEditText = findViewById(R.id.content_edit_text_device_activity);
 
         if (device != null) {
             if (device.getName() != null) {
@@ -60,7 +60,7 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     /**
-     * Wywoływana gdy użytkownik naciśnie przycisk powrotu, ustawiająca tytuł i zawartość do notatki i zwraca tą notatkę do Activity-rodzica
+     * Wywoływana gdy użytkownik naciśnie przycisk powrotu, ustawiająca nazwę i notatkę do urządzenia i zwraca to urządzenie do Activity-rodzica
      */
     @Override
     public void onBackPressed() {
@@ -70,7 +70,7 @@ public class DeviceActivity extends AppCompatActivity {
         }
 
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("return_note", device);
+        returnIntent.putExtra("return_device", device);
         setResult(RESULT_OK, returnIntent);
 
         super.onBackPressed();
@@ -97,7 +97,7 @@ public class DeviceActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        //dodanie obrazka do notatki
+        //dodanie obrazka do urządzenia
         if (item.getItemId() == R.id.add_picture_menu_item) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
@@ -106,11 +106,11 @@ public class DeviceActivity extends AppCompatActivity {
             }
         }
 
-        //usunięcie obrazka z notatki
+        //usunięcie obrazka z urządzenia
         if (item.getItemId() == R.id.remove_picture_menu_item) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Usuwanie obrazu")
-                    .setMessage("Czy chcesz usunąć obraz z tej notatki?\nObraz nie zostanie usunięty z oryginalnej lokalizacji.")
+                    .setMessage("Czy chcesz usunąć obraz z tego urządzenia?\nObraz nie zostanie usunięty z oryginalnej lokalizacji.")
                     .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -123,11 +123,11 @@ public class DeviceActivity extends AppCompatActivity {
                     }).create().show();
         }
 
-        //dodanie zdarzenia do notatki
-        if (item.getItemId() == R.id.add_event_menu_item) {
+        //dodanie szczegółów do urządzenia
+        if (item.getItemId() == R.id.add_details_menu_item) {
             Intent intent = new Intent(this, DetailsActivity.class);
-            intent.putExtra("current_note_for_event", device);
-            startActivityForResult(intent, EVENT_REQUEST);
+            intent.putExtra("current_device_for_details", device);
+            startActivityForResult(intent, DETAILS_REQUEST);
         }
 
         return true;
@@ -160,8 +160,8 @@ public class DeviceActivity extends AppCompatActivity {
         }
 
         //Activity modyfikujące wydarzenie
-        if (requestCode == EVENT_REQUEST && resultCode == RESULT_OK && data != null) {
-            Device returnDevice = (Device) data.getSerializableExtra("note_return_from_event");
+        if (requestCode == DETAILS_REQUEST && resultCode == RESULT_OK && data != null) {
+            Device returnDevice = (Device) data.getSerializableExtra("device_return_from_details");
             if (returnDevice != null) {
                 this.device.setDate(returnDevice.getDateDate());
                 this.device.setLocation(returnDevice.getLocation());

@@ -47,7 +47,7 @@ import java.util.List;
  * @author Jakub Malinowski
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewListener {
-    private RecyclerView notesRecyclerView;
+    private RecyclerView deviceRecyclerView;
     private DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     private File data;
     private List<Device> devices;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        data = new File(getApplicationContext().getFilesDir(), "notes_data.data");
+        data = new File(getApplicationContext().getFilesDir(), "devices_data.data");
 
         if (!data.exists()) {
             boolean created = false;
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(), "Brak notatek", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Brak urządzeń", Toast.LENGTH_LONG).show();
                     }
                 });
                 builder.create().show();
@@ -89,9 +89,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(data))) {
                 devices = (List<Device>) objectInputStream.readObject();
                 if (!devices.isEmpty()) {
-                    Toast.makeText(this, "Załadowano notatki", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Załadowano urządzenia", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(this, "Brak notatek", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Brak urządzeń", Toast.LENGTH_LONG).show();
                 }
             } catch (IOException | ClassNotFoundException e) {
                 closeAppWithFileError("Błąd odczytu danych.").show();
@@ -101,14 +101,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
         if (devices != null) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
 
-            notesRecyclerView = findViewById(R.id.list_of_notes_recycler_view);
+            deviceRecyclerView = findViewById(R.id.list_of_devices_recycler_view);
 
             devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(this, preferences, devices);
             devicesRecyclerViewAdapter.setRecyclerViewListener(this);
 
-            notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            notesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
-            notesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+            deviceRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            deviceRecyclerView.setAdapter(devicesRecyclerViewAdapter);
+            deviceRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
             if (preferences.getBoolean("show_help", true)) {
                 buildHelpBaseAlertDialogBuilder().setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -176,10 +176,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        //nowa notatka
-        if (item.getItemId() == R.id.new_note) {
+        //nowe urządzenie
+        if (item.getItemId() == R.id.new_device) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Tytuł notatki");
+            builder.setTitle("Nazwa urządzenia");
 
             final View view = getLayoutInflater().inflate(R.layout.add_device_layout, null);
             builder.setView(view);
@@ -233,21 +233,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
 
         }
 
-        //wybór koloru tła notatek
+        //wybór koloru tła listy
         if (item.getItemId() == R.id.choose_color) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
 
             ColorPickerDialogBuilder
                     .with(this)
-                    .setTitle("Kolor notatek zmieni sie po restarcie aplikacji")
-                    .initialColor(preferences.getInt("note_color", Color.parseColor("#FFFACD")))
+                    .setTitle("Kolor listy zmieni się po restarcie aplikacji")
+                    .initialColor(preferences.getInt("list_color", Color.parseColor("#FFFACD")))
                     .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                     .density(12)
                     .setPositiveButton("ok", new ColorPickerClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                            preferences.edit().putInt("note_color", selectedColor).apply();
-                            Toast.makeText(getApplicationContext(), "Kolor notatek zmieni się po ponownym uruchomieniu aplikacji", Toast.LENGTH_LONG).show();
+                            preferences.edit().putInt("list_color", selectedColor).apply();
+                            Toast.makeText(getApplicationContext(), "Kolor listy zmieni się po ponownym uruchomieniu aplikacji", Toast.LENGTH_LONG).show();
                         }
                     })
                     .setNegativeButton("anuluj", new DialogInterface.OnClickListener() {
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (data != null) {
-            Device device = (Device) data.getSerializableExtra("return_note");
+            Device device = (Device) data.getSerializableExtra("return_device");
 
             if (device != null) {
                 devices.get(requestCode).setName(device.getName());
@@ -299,29 +299,29 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
     }
 
     /**
-     * Klikniecie powodujące przejście w tryb modyfikacji notatki
+     * Klikniecie powodujące przejście w tryb modyfikacji urządzenia
      *
      * @param view     element wywołujący
-     * @param position pozycja notatki
+     * @param position pozycja urządzenia
      */
     @Override
     public void onModifyClick(View view, int position) {
         Intent intent = new Intent(this, DeviceActivity.class);
-        intent.putExtra("current_note", devices.get(position));
+        intent.putExtra("current_device", devices.get(position));
         startActivityForResult(intent, position);
     }
 
     /**
-     * Ruch powodujący usunięcie notatki
+     * Ruch powodujący usunięcie urządzenia
      *
      * @param view     element wywołujący
-     * @param position pozycja notatki
+     * @param position pozycja urządzenia
      */
     @Override
     public void onDeleteMotion(View view, final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Usuwanie notatki")
-                .setMessage("Czy na pewno chcesz usunąć tą notatkę?")
+        builder.setTitle("Usuwanie urządzenia")
+                .setMessage("Czy na pewno chcesz usunąć to urządzenie?")
                 .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -345,17 +345,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
      */
     private AlertDialog.Builder buildHelpBaseAlertDialogBuilder() {
         return new AlertDialog.Builder(this).setTitle("Informacje i pomoc (proszę się dokładnie zapoznać)")
-                .setMessage("Aplikacja umożliwiwa dodawanie różnego typu notatek, np. \"szybkich\" które są reprezentowane tylko tytułem. " +
-                        "Po dotknięciu takiej notatki możliwa jest jej edycja i rozbudowanie jej o opis oraz dodanie/zmiana/usuwanie obrazka. " +
-                        "Do danej notatki możliwe jest także dodawanie wydarzenia poprzez dotknięcie odpowiedniego przycisku. " +
-                        "W wydarzeniu możemy modyfikować datę wraz z godziną i lokalizację. " +
-                        "Zapis danej notatki po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
-                        "Usunięcie następuje poprzez dłuższe przytrzymanie danej notatki w widoku ekranu głównego. " +
-                        "Umożliwiono także zmianę koloru tła notatek. " +
+                .setMessage("Aplikacja umożliwiwa zapisywanie informacji o zarządznych urządzeniach sieciowych. " +
+                        "Po dotknięciu takiego urządzenia możliwa jest jego edycja i rozbudowanie go o notatkę oraz dodanie/zmiana/usuwanie obrazka. " +
+                        "Do danego urządzenia możliwe jest także dodawanie szczegółych informacji poprzez dotknięcie odpowiedniego przycisku. " +
+                        "Można modyfikować datę wraz z godziną ostatneiego przeglądu technicznego i lokalizację danego urządzenia. Dodatkowo po kliknięciu w przycisk z lokalizacją, zostaniemy przekierowani do aplikacji map Google w celu szybkiego odnalezienia urządzenia. " +
+                        "Zapis danego urządzenia po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
+                        "Usunięcie następuje poprzez dłuższe przytrzymanie danego urządzenia w widoku ekranu głównego. " +
+                        "Umożliwiono także zmianę koloru tła listy z urządzeniami. " +
                         "Z poziomu aplikacji możliwe jest także sprawdzenie ostatnich zanotowanych danych meteorologicznych dla wybranej miejscowości, po klinknięciu na odpowiednią opcję menu głównego. " +
                         "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +
                         "W razie wątpliwości można wrócić do tej informacji poprzez wybranie opcji \"Informacje i pomoc\" lub (?) (w zależności sposobu wyświetlania) w górnej belce aplikacji. " +
-                        "\n\nAutorzy:\nMonika Jakubiec\nJakub Malinowski\n\nVersion: 2.0");
+                        "\n\nAutor:\nJakub Malinowski\n\nVersion: 3.0");
     }
 
     /**

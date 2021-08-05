@@ -22,21 +22,21 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Adapter wiążący dane (notatki) z RecyclerView
+ * Adapter wiążący dane (urządzenia) z RecyclerView
  */
 public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecyclerViewAdapter.ViewHolder> {
-    private List<Device> devices;
-    private GestureDetector gestureDetector;
-    private AlertDialog pictureNotExistAlertDialog;
-    private SharedPreferences preferences;
-    private RecyclerViewGestureDetector recyclerViewGestureDetector;
+    private final List<Device> devices;
+    private final GestureDetector gestureDetector;
+    private final AlertDialog pictureNotExistAlertDialog;
+    private final SharedPreferences preferences;
+    private final RecyclerViewGestureDetector recyclerViewGestureDetector;
 
     /**
      * Kontruktor obiektu adaptera, tworzący obiekt typu RecyclerViewGestureDetector, GestureDetector i AlertDialog
      *
      * @param context     kontekst
      * @param preferences zapisane ustawienia
-     * @param devices       lista notatek
+     * @param devices       lista urządzeń
      */
     public DevicesRecyclerViewAdapter(Context context, SharedPreferences preferences, List<Device> devices) {
         this.devices = devices;
@@ -45,7 +45,7 @@ public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecy
         gestureDetector = new GestureDetector(context, recyclerViewGestureDetector);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        pictureNotExistAlertDialog = builder.setMessage("Niektóre obrazy nie istnieją/zosatały usunięte z oryginalnej lokalizacji. Aby zapobiec zbędnemu pokazywaniu komunikatu należy usunąć obraz z poziomu notatki.").setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        pictureNotExistAlertDialog = builder.setMessage("Niektóre obrazy nie istnieją/zosatały usunięte z oryginalnej lokalizacji. Aby zapobiec zbędnemu pokazywaniu komunikatu należy usunąć obraz z poziomu applikacji.").setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
@@ -133,7 +133,7 @@ public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecy
     }
 
     /**
-     * Notatka tylko z tytułem na danej pozycji RecyclerView
+     * Urządzenie tylko z nazwą na danej pozycji RecyclerView
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView titleTextView;
@@ -145,7 +145,7 @@ public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecy
     }
 
     /**
-     * Notatka z tytułem i opisem na danej pozycji RecyclerView
+     * Urządzenie z nazwą i notatką na danej pozycji RecyclerView
      */
     public static class ViewHolderWithContent extends DevicesRecyclerViewAdapter.ViewHolder {
         private TextView contentTextView;
@@ -157,7 +157,7 @@ public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecy
     }
 
     /**
-     * Notatka z tytułem, opisem i obrazkiem na danej pozycji RecyclerView
+     * Urządzenie z nazwą, notatką i obrazkiem na danej pozycji RecyclerView
      */
     public static class ViewHolderWithPicture extends DevicesRecyclerViewAdapter.ViewHolderWithContent {
         private ImageView imageView;
@@ -197,12 +197,12 @@ public class DevicesRecyclerViewAdapter extends RecyclerView.Adapter<DevicesRecy
     }
 
     /**
-     * Ustawianie koloru tła notatek
+     * Ustawianie koloru tła listy
      *
      * @param view view
      */
     private void setColor(View view) {
         CardView cardView = view.findViewById(R.id.card_view);
-        cardView.setCardBackgroundColor(preferences.getInt("note_color", Color.parseColor("#FFFACD")));
+        cardView.setCardBackgroundColor(preferences.getInt("list_color", Color.parseColor("#FFFACD")));
     }
 }

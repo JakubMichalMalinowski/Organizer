@@ -8,7 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
- * Notatka
+ * Urządzenie
  */
 public class Device implements Serializable {
     private String name;

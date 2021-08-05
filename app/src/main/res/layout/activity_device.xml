@@ -7,7 +7,7 @@
     tools:context=".DeviceActivity">
 
     <EditText
-        android:id="@+id/title_edit_text_note_activity"
+        android:id="@+id/title_edit_text_device_activity"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="20dp"
@@ -20,7 +20,7 @@
         android:hint="@string/device_name"/>
 
     <EditText
-        android:id="@+id/content_edit_text_note_activity"
+        android:id="@+id/content_edit_text_device_activity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
@@ -35,6 +35,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title_edit_text_note_activity"
+        app:layout_constraintTop_toBottomOf="@+id/title_edit_text_device_activity"
         android:padding="10dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ import android.view.View;
  */
 public interface RecyclerViewListener {
     /**
-     * Działania przy akcji powodującej modyfikację notatki
+     * Działania przy akcji powodującej modyfikację urządzenia
      *
      * @param view     view - źródło zdarzenia
      * @param position pozycja w zbiorze danych
@@ -15,7 +15,7 @@ public interface RecyclerViewListener {
     void onModifyClick(View view, int position);
 
     /**
-     * Działania przy zdarzeniu powodującym usunięcie notatki
+     * Działania przy zdarzeniu powodującym usunięcie urządzenia
      *
      * @param view     view - źródło zdarzenia
      * @param position pozycja w zbiorze danych

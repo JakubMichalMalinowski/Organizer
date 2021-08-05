@@ -47,7 +47,7 @@ public class DetailsActivity extends AppCompatActivity {
         dateTextView = findViewById(R.id.date_text_view);
         locationButton = findViewById(R.id.location_button);
 
-        device = (Device) getIntent().getSerializableExtra("current_note_for_event");
+        device = (Device) getIntent().getSerializableExtra("current_device_for_details");
 
         if (device != null) {
             if (device.getDate() != null) {
@@ -279,12 +279,12 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     /**
-     * Wywoływana gdy użytkownik naciśnie przycisk powrotu, zwracjąca wartość do Activity-rodzica, zwraca notatkę z modyfikacjami wydarzenia
+     * Wywoływana gdy użytkownik naciśnie przycisk powrotu, zwracjąca wartość do Activity-rodzica, zwraca urządzenie z modyfikacjami szczegółów
      */
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        intent.putExtra("note_return_from_event", device);
+        intent.putExtra("device_return_from_details", device);
         setResult(RESULT_OK, intent);
 
         super.onBackPressed();
