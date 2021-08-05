@@ -9,12 +9,6 @@
         android:icon="@drawable/ic_add_device" />
 
     <item
-        android:id="@+id/last_weather"
-        android:title="@string/weather"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_weather"/>
-
-    <item
         android:id="@+id/choose_color"
         android:title="@string/choose_color"
         app:showAsAction="ifRoom"

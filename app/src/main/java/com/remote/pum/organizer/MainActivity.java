@@ -207,32 +207,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
             builder.create().show();
         }
 
-        //pogoda
-        if (item.getItemId() == R.id.last_weather) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            View view = getLayoutInflater().inflate(R.layout.weather_location_layout, null, false);
-            final EditText editText = view.findViewById(R.id.weather_location_edit_text);
-            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-
-            editText.setText(preferences.getString("weather_location", ""));
-
-            builder.setTitle("Wpisz miejscowość (bez polskich znakow)")
-                    .setView(view)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            preferences.edit().putString("weather_location", editText.getText().toString()).apply();
-                            downloadWeather(editText.getText().toString());
-                        }
-                    })
-                    .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    }).create().show();
-
-        }
-
         //wybór koloru tła listy
         if (item.getItemId() == R.id.choose_color) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
@@ -352,104 +326,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewListe
                         "Zapis danego urządzenia po modyfikacjach następuje po dotknięciu przycisku powrotu, zrobiono tak ze względu na wygode i bezpieczeństwo użytkownika. " +
                         "Usunięcie następuje poprzez dłuższe przytrzymanie danego urządzenia w widoku ekranu głównego. " +
                         "Umożliwiono także zmianę koloru tła listy z urządzeniami. " +
-                        "Z poziomu aplikacji możliwe jest także sprawdzenie ostatnich zanotowanych danych meteorologicznych dla wybranej miejscowości, po klinknięciu na odpowiednią opcję menu głównego. " +
                         "Aby zobaczyć opis danego przycisku należy go przytrzymać. " +
                         "W razie wątpliwości można wrócić do tej informacji poprzez wybranie opcji \"Informacje i pomoc\" lub (?) (w zależności sposobu wyświetlania) w górnej belce aplikacji. " +
                         "\n\nAutor:\nJakub Malinowski\n\nVersion: 3.0");
-    }
-
-    /**
-     * Pobieranie pogody dla podanej lokalizacji
-     *
-     * @param location lokalizacja dla której pobierania jest pogoda
-     */
-    private void downloadWeather(String location) {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Czekaj, trwa pobieranie...");
-        progressDialog.show();
-
-        //usunięcie spacji i zamiana wszystkich liter na małe
-        final String loc = location.toLowerCase().replaceAll("\\s", "");
-        final Context context = this;
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                URL imgw;
-                HttpURLConnection imgwConnection = null;
-
-                try {
-                    imgw = new URL("https://danepubliczne.imgw.pl/api/data/synop/station/" + loc + "/format/json");
-                    imgwConnection = (HttpURLConnection) imgw.openConnection();
-                    Gson gson = new Gson();
-                    if (imgwConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                        InputStreamReader reader = new InputStreamReader(imgwConnection.getInputStream());
-                        final Weather weather = gson.fromJson(reader, Weather.class);
-                        final View view = getLayoutInflater().inflate(R.layout.weather_layout, null, false);
-
-                        ((TextView) view.findViewById(R.id.weather_date_and_time)).setText(String.format(" Czas pomiaru: %s\t%s:00", weather.getData_pomiaru(), weather.getGodzina_pomiaru()));
-                        ((TextView) view.findViewById(R.id.weather_temperature)).setText(String.format(" Temperatura: %s", weather.getTemperatura()));
-                        ((TextView) view.findViewById(R.id.weather_wind_velocity)).setText(String.format(" Prędkość: %s", weather.getPredkosc_wiatru()));
-                        ((TextView) view.findViewById(R.id.weather_wind_direction)).setText(String.format(" Kierunek: %s", weather.getKierunek_wiatru()));
-                        ((TextView) view.findViewById(R.id.weather_humidity)).setText(String.format(" Wilgotność względna: %s", weather.getWilgotnosc_wzgledna()));
-                        ((TextView) view.findViewById(R.id.weather_rain)).setText(String.format(" Suma opadu: %s", weather.getSuma_opadu()));
-                        ((TextView) view.findViewById(R.id.weather_pressure)).setText(String.format(" Ciśnienie: %s", weather.getCisnienie()));
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                                new AlertDialog.Builder(context).setTitle("Pogoda dla: " + weather.getStacja())
-                                        .setView(view)
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                            }
-                                        }).create().show();
-                            }
-                        });
-
-                    } else if (imgwConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                                new AlertDialog.Builder(context).setTitle("Błąd")
-                                        .setMessage("Stacja nie została znaleziona. Proszę sprawdzić poprawność nazwy miejscowości lub użyć większej miejscowości.")
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                            }
-                                        }).create().show();
-                            }
-                        });
-                    } else {
-                        throw new IOException();
-                    }
-                } catch (IOException e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Błąd")
-                                    .setMessage("Bład przy połączeniu z serwerem dostarczającym informacje pogodowe. Pobranie danych jest niemożliwe.")
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    }).create().show();
-                        }
-                    });
-                } finally {
-                    if (imgwConnection != null) {
-                        imgwConnection.disconnect();
-                    }
-
-                    if (progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                    }
-                }
-            }
-        }).start();
     }
 }
