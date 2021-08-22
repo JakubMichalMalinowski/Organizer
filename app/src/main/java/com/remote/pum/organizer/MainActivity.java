@@ -43,7 +43,6 @@ import java.util.List;
 /**
  * Główne Activity aplikacji
  *
- * @author Monika Jakubiec
  * @author Jakub Malinowski
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewListener {
