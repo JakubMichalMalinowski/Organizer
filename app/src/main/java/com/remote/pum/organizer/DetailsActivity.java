@@ -119,20 +119,24 @@ public class DetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         //edycja daty
         if (item.getItemId() == R.id.edit_date_menu_item) {
-            View view = LayoutInflater.from(this).inflate(R.layout.edit_date_layout, null, false);
+            View view = LayoutInflater.from(this)
+                    .inflate(R.layout.edit_date_layout, null, false);
 
             final Spinner yearSpinner = view.findViewById(R.id.year_spinner);
-            yearSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, YEARS));
+            yearSpinner.setAdapter(new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, YEARS));
 
             final Spinner monthSpinner = view.findViewById(R.id.month_spinner);
-            monthSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, MONTHS));
+            monthSpinner.setAdapter(new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, MONTHS));
 
             final Spinner daySpinner = view.findViewById(R.id.day_spinner);
             setDaysNumber(yearSpinner, monthSpinner, daySpinner);
 
             if (device.getDate() == null) {
-                yearSpinner.setSelection(Calendar.getInstance().get(Calendar.YEAR) - 2000);
-                monthSpinner.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+                yearSpinner.setSelection(Calendar.getInstance()
+                        .get(Calendar.YEAR) - 2000);
+                monthSpinner.setSelection(0);
             } else {
                 yearSpinner.setSelection(device.getDateYear() - 2000);
                 monthSpinner.setSelection(device.getDateMonth());
@@ -140,7 +144,10 @@ public class DetailsActivity extends AppCompatActivity {
 
             yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                public void onItemSelected(AdapterView<?> parent,
+                                           View view,
+                                           int position,
+                                           long id) {
                     setDaysNumber(yearSpinner, monthSpinner, daySpinner);
                 }
 
@@ -182,7 +189,11 @@ public class DetailsActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            device.setDate((int) yearSpinner.getSelectedItem(), (int) monthSpinner.getSelectedItem(), (int) daySpinner.getSelectedItem(), (int) hourSpinner.getSelectedItem(), (int) minSpinner.getSelectedItem());
+                            device.setDate((int) yearSpinner.getSelectedItem(),
+                                    (int) monthSpinner.getSelectedItem(),
+                                    (int) daySpinner.getSelectedItem(),
+                                    (int) hourSpinner.getSelectedItem(),
+                                    (int) minSpinner.getSelectedItem());
                             dateTextView.setText(device.getDate());
                         }
                     })
@@ -263,24 +274,29 @@ public class DetailsActivity extends AppCompatActivity {
         int year = ((int) yearSpinner.getSelectedItem());
 
         //miesiące z 31 dniami
-        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-            daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS));
+        if (month == 1 || month == 3 || month == 5 || month == 7
+                || month == 8 || month == 10 || month == 12) {
+            daySpinner.setAdapter(new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, DAYS));
         } else {
             //luty
             if (month == 2) {
                 //przestępny
                 if ((year % 4) == 0) {
-                    daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 29)));
+                    daySpinner.setAdapter(new ArrayAdapter<>(this,
+                            android.R.layout.simple_spinner_item, DAYS.subList(0, 29)));
                 } else {
-                    daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 28)));
+                    daySpinner.setAdapter(new ArrayAdapter<>(this,
+                            android.R.layout.simple_spinner_item, DAYS.subList(0, 28)));
                 }
             } else {
-                daySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, DAYS.subList(0, 30)));
+                daySpinner.setAdapter(new ArrayAdapter<>(this,
+                        android.R.layout.simple_spinner_item, DAYS.subList(0, 30)));
             }
         }
 
         if (device.getDate() == null) {
-            daySpinner.setSelection(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
+                daySpinner.setSelection(0);
         } else {
             daySpinner.setSelection(device.getDateDay() - 1);
         }
