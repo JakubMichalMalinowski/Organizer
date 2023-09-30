@@ -1,4 +1,2 @@
 # Organizer
-Projekt na PUM - Organizer - aplikacja na Android
-
-Jest to aplikacja w fazie rozwoju.
+Android app to store notes and manage them.
